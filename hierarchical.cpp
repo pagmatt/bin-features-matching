@@ -4,12 +4,12 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/features2d.hpp>
 // Linear algebra library
-#include <armadillo>
+// #include <armadillo>
 
 
 using namespace std;
 // Armadillo
-using namespace arma;
+// using namespace arma;
 // OpenCV
 using namespace cv;
 
@@ -59,17 +59,48 @@ int main(int, char **)
 	*/
 
 	// Test hierarchical tree strcuture
-	HierarchicalLibs::create_search_tree(&out_orb_feat);
+	HierarchicalLibs::create_search_tree(out_orb_feat, 5, 10);
 }
 
-void HierarchicalLibs::create_search_tree(cv::Mat* features_set)
+tree<cv::Mat> 
+HierarchicalLibs::create_search_tree(cv::Mat features_set, int branch_factor, int max_leaves)
 {
+	/* Inform user of tree creation
     cout << "Creating hierarchical search structure, for ";
-	cout << features_set->size().height << " features" <<  endl;
+	cout << features_set.size().height << " features" <<  endl;
+	*/
+	tree<cv::Mat> out_tree;
+	tree<cv::Mat>::iterator top;
+	int feat_amount = features_set.size().height;
 
+	top = out_tree.begin();
+
+	if(feat_amount << max_leaves)
+	{
+		// Create leaf node with all the points in the dataset
+		out_tree.insert(top, features_set);
+	}
+	else
+	{
+		std::vector<u_int16_t> rnd_centers;
+
+		// Pick "branch_factor" random points in dataset as centers
+		// and cluster around them
+		
+
+	}
+	return out_tree;
+}
+void 
+HierarchicalLibs::pick_unique_rnd(vector<u_int16_t> &rnd_unique_set, int min, int max)
+{
+	std::default_random_engine rng_engine;
+	std::uniform_int_distribution<int> distribution(min, max);
+
+	// distribution(rng_engine)
+
+}
 	
 
-
-}
 
 
