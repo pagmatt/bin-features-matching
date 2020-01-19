@@ -59,11 +59,11 @@ int main(int, char **)
 	*/
 
 	// Test hierarchical tree strcuture
-	HierarchicalLibs::create_search_tree(out_orb_feat, 5, 10);
+	MatchingLibs::create_search_tree(out_orb_feat, 5, 10);
 }
 
 tree<cv::Mat> 
-HierarchicalLibs::create_search_tree(cv::Mat features_set, int branch_factor, int max_leaves)
+MatchingLibs::create_search_tree(cv::Mat features_set, int branch_factor, int max_leaves)
 {
 	/* Inform user of tree creation
     cout << "Creating hierarchical search structure, for ";
@@ -82,24 +82,45 @@ HierarchicalLibs::create_search_tree(cv::Mat features_set, int branch_factor, in
 	}
 	else
 	{
-		std::vector<u_int16_t> rnd_centers;
-
 		// Pick "branch_factor" random points in dataset as centers
 		// and cluster around them
-		
-
+		std::set<u_int16_t> rnd_centers;
+		MatchingLibs::pick_unique_rnd(rnd_centers, branch_factor, 0, feat_amount);
 	}
 	return out_tree;
 }
 void 
-HierarchicalLibs::pick_unique_rnd(vector<u_int16_t> &rnd_unique_set, int min, int max)
+MatchingLibs::pick_unique_rnd(std::set<u_int16_t> &rnd_set, int rnd_amount, int min, int max)
 {
 	std::default_random_engine rng_engine;
 	std::uniform_int_distribution<int> distribution(min, max);
 
-	// distribution(rng_engine)
+	while(rnd_set.size() < rnd_amount)	// Want unique rnd values
+	{
+		rnd_set.insert(distribution(rng_engine));
+	}
 
 }
+
+static tree<cv::Mat> 
+partition_around_centers(std::set<u_int16_t> centers_set, cv::Mat features_set)
+{
+	tree<cv::Mat> out_tree;
+
+	for(int i=0; i<features_set.size().height; i++)
+	{	
+		uint16_t lucky_index;
+		auto centers_iter = centers_set.begin(); // Get iterator to 1st element
+		for(int j=0; j < centers_set.size(), j++)
+		{
+			std::advance(centers_iter, 1);     // advance by 9
+			features_set.col(*centers_iter); 
+		}
+	}
+	return out_tree;
+}
+
+
 	
 
 
