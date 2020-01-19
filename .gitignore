@@ -1,0 +1,10 @@
+*.diff
+*.orig
+*.patch
+*.rej
+*.o
+*.a
+
+build/
+.vscode/
+Images_dataset/
