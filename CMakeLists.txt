@@ -8,9 +8,9 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 include(CTest)
 enable_testing()
 
-add_executable(feature-matching hierarchical.cpp)
+add_executable(bin-feat-matching hierarchical.cpp)
 
-target_link_libraries(feature-matching ${OpenCV_LIBS})
+target_link_libraries(bin-feat-matching ${OpenCV_LIBS})
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
