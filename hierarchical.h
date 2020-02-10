@@ -11,6 +11,12 @@
 class MatchingLibs
 {
 	public:
+		static void
+		merge_mat(cv::Mat &dest, cv::Mat &cand);
+		static cv::Mat
+		parallel_search(cv::Mat features_set, int branch_factor, int max_leaves, int trees, cv::Mat query);
+		static void
+		traverse_search_tree(tree<cv::Mat> &s_tree, tree<cv::Mat>::iterator from, cv::Mat &found, cv::Mat query);
 		static tree<cv::Mat> 
 		create_search_tree(cv::Mat features_set, tree<cv::Mat> &out_tree, tree<cv::Mat>::pre_order_iterator pos, int branch_factor, int max_leaves);
 	private:
@@ -18,7 +24,29 @@ class MatchingLibs
 		pick_unique_rnd(int rnd_amount, int min, int max);
 		static std::map<int, cv::Mat>
 		partition_around_centers(std::vector<int> &centers_set, cv::Mat &features_set);
+
 };
+
+void
+MatchingLibs::merge_mat(cv::Mat &dest, cv::Mat &cand)
+{
+	for(int i = 0; i < cand.size().height; i++)
+	{
+		bool there = false;
+		for(int k = 0; k < dest.size().height; k++)
+		{
+			if(cv::norm(dest.row(k), cand.row(i), cv::NORM_HAMMING) == 0)
+			{
+				there = true;
+				break;
+			}
+		}
+		if (!there)
+		{
+			dest.push_back(cand.row(i));
+		}
+	}
+}
 
 std::vector<int>
 MatchingLibs::pick_unique_rnd(int rnd_amount, int min, int max)
@@ -35,6 +63,8 @@ MatchingLibs::pick_unique_rnd(int rnd_amount, int min, int max)
 	std::vector<int> out(rnd_set.begin(), rnd_set.end());
 	return out;
 }
+
+
 
 std::map<int, cv::Mat>
 MatchingLibs::partition_around_centers(std::vector<int> &centers_set, cv::Mat &features_set)
@@ -75,6 +105,69 @@ MatchingLibs::partition_around_centers(std::vector<int> &centers_set, cv::Mat &f
 
 	return out_partition;
 }
+
+
+cv::Mat
+MatchingLibs::parallel_search(cv::Mat features_set, int branch_factor, int max_leaves, int trees, cv::Mat query)
+{
+	// Create the search trees
+	std::vector<tree<cv::Mat>> tree_vec;
+	for(int i=0; i < trees; i++)
+	{
+		tree<cv::Mat> out_tree;
+		tree<cv::Mat>::pre_order_iterator out_iter;
+		out_iter = out_tree.begin();
+		out_iter = out_tree.insert(out_iter, cv::Mat::zeros(features_set.size().width, 1, CV_16F)); // Dummy head
+		MatchingLibs::create_search_tree(features_set, out_tree, out_iter, 5, 50);
+		tree_vec.push_back(out_tree);
+	}
+	// Search
+	std::vector<tree<cv::Mat>>::iterator tree_vec_it = tree_vec.begin();
+	cv::Mat found;
+	while(tree_vec_it != tree_vec.end())
+	{
+		tree<cv::Mat>::pre_order_iterator out_iter = tree_vec_it->begin();
+		MatchingLibs::traverse_search_tree(*tree_vec_it, out_iter, found, query);
+		std::cout << found.size() << " matches found!" << std::endl;
+		tree_vec_it++;
+	}
+
+	return found;
+}
+
+
+
+void
+MatchingLibs::traverse_search_tree(tree<cv::Mat> &s_tree, tree<cv::Mat>::iterator from, cv::Mat &found, cv::Mat query)
+{
+
+	if(s_tree.number_of_children(from) <= 1)
+	{
+		// Leaf node
+		from = s_tree.child(from, 0);
+		MatchingLibs::merge_mat(found, from.node->data);
+	}
+	else
+	{
+		// Pick non-leaf closest to query
+		tree<cv::Mat>::pre_order_iterator lucky_it;
+		int lucky_dist = query.size().width*32; // Max Hamming distance
+		for(int i=0; i < s_tree.number_of_children(from); i++)
+		{
+			tree<cv::Mat>::pre_order_iterator lottery_it = s_tree.child(from, i);
+			//std::cout << lottery_it.node->data.size();
+			auto temp_dist = cv::norm(query, lottery_it.node->data, cv::NORM_HAMMING); 
+			if(temp_dist < lucky_dist)
+			{
+				lucky_dist = temp_dist;
+				lucky_it = lottery_it;
+			}
+		}
+		// Recurse on such node
+		MatchingLibs::traverse_search_tree(s_tree, lucky_it, found, query);
+	}
+}
+
 
 tree<cv::Mat> 
 MatchingLibs::create_search_tree(cv::Mat features_set, tree<cv::Mat> &out_tree, tree<cv::Mat>::pre_order_iterator pos, int branch_factor, int max_leaves)
