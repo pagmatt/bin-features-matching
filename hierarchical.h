@@ -12,19 +12,20 @@ class MatchingLibs
 {
 	public:
 		static tree<cv::Mat> 
-		create_search_tree(cv::Mat features_set, int branch_factor, int max_leaves);
+		create_search_tree(cv::Mat features_set, tree<cv::Mat> &out_tree, tree<cv::Mat>::pre_order_iterator pos, int branch_factor, int max_leaves);
 	private:
 		static std::vector<int>
 		pick_unique_rnd(int rnd_amount, int min, int max);
-		static tree<cv::Mat> 
+		static std::map<int, cv::Mat>
 		partition_around_centers(std::vector<int> &centers_set, cv::Mat &features_set);
 };
 
 std::vector<int>
 MatchingLibs::pick_unique_rnd(int rnd_amount, int min, int max)
 {
+	std::random_device r;
 	std::set<int> rnd_set = std::set<int>();
-	std::default_random_engine rng_engine;
+	std::default_random_engine rng_engine{r()};
 	std::uniform_int_distribution<int> distribution(min, max);
 
 	while(rnd_set.size() < rnd_amount)	// Want unique rnd values
@@ -35,7 +36,7 @@ MatchingLibs::pick_unique_rnd(int rnd_amount, int min, int max)
 	return out;
 }
 
-tree<cv::Mat> 
+std::map<int, cv::Mat>
 MatchingLibs::partition_around_centers(std::vector<int> &centers_set, cv::Mat &features_set)
 {
 	std::map<int, cv::Mat> out_partition;
@@ -71,33 +72,40 @@ MatchingLibs::partition_around_centers(std::vector<int> &centers_set, cv::Mat &f
 		//std::cout << lucky_index << " @ distance: " << dist_to_center << std::endl;
 	}
 
-	return out_tree;
+	return out_partition;
 }
 
 tree<cv::Mat> 
-MatchingLibs::create_search_tree(cv::Mat features_set, int branch_factor, int max_leaves)
+MatchingLibs::create_search_tree(cv::Mat features_set, tree<cv::Mat> &out_tree, tree<cv::Mat>::pre_order_iterator pos, int branch_factor, int max_leaves)
 {
 	/* Inform user of tree creation
     cout << "Creating hierarchical search structure, for ";
 	cout << features_set.size().height << " features" <<  endl;
 	*/
-	tree<cv::Mat> out_tree;
-	tree<cv::Mat>::iterator top;
-
+	tree<cv::Mat>::pre_order_iterator newPos = pos;
 	int feat_amount = features_set.size().height;
-	top = out_tree.begin();
 
 	if(feat_amount < max_leaves)
 	{
 		// Create leaf node with all the points in the dataset
-		out_tree.insert(top, features_set);
+		out_tree.append_child(pos, features_set);
 	}
 	else
 	{	
 		// Pick "branch_factor" random points in dataset as centers
 		// and cluster around them
 		std::vector<int> rnd_centers = MatchingLibs::pick_unique_rnd(branch_factor, 0, feat_amount);
-		MatchingLibs::partition_around_centers(rnd_centers, features_set);
+		std::map<int, cv::Mat> cnt_partition = MatchingLibs::partition_around_centers(rnd_centers, features_set);
+		// Iterate through partition map, create nodes and recursively call the function
+		std::map<int, cv::Mat>::iterator map_iter = cnt_partition.begin();
+		while(map_iter != cnt_partition.end())
+		{
+			auto index = map_iter->first;
+			newPos = out_tree.append_child(pos, features_set.row(index));
+			
+			MatchingLibs::create_search_tree(map_iter->second, out_tree, newPos, branch_factor, max_leaves);
+			map_iter++;
+		}
 	}
 	return out_tree;
 }
