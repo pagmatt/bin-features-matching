@@ -60,13 +60,12 @@ int main(int, char **)
 	*/
 
 	// Test hierarchical tree strcuture
-	cv::Mat skimmed = out_orb_feat(Range::all(), Range(1, 3)).clone(); // Sikm features for testing purposes
+	// cv::Mat skimmed = out_orb_feat; //(Range::all(), Range(1, 3)).clone(); // Skim features for testing purposes
 	tree<cv::Mat> out_tree;
 	tree<cv::Mat>::pre_order_iterator out_iter;
 	out_iter = out_tree.begin();
-	out_iter = out_tree.insert(out_iter, skimmed.row(1));
-	MatchingLibs::create_search_tree(skimmed, out_tree, out_iter, 5, 20);
-	out_tree.print("", true);
+	out_iter = out_tree.insert(out_iter, cv::Mat::zeros(out_orb_feat.size().width, 1, CV_16F)); // Dummy head
+	MatchingLibs::create_search_tree(out_orb_feat, out_tree, out_iter, 5, 20);
 
 }
 

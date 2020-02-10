@@ -50,6 +50,7 @@ MatchingLibs::partition_around_centers(std::vector<int> &centers_set, cv::Mat &f
 		for (auto i = centers_set.begin(); i != centers_set.end(); i++)
 		{
 			//std::cout << "Trying " << *i << std::endl; 
+			//std::cout << "Features size " << features_set.size() << std::endl; 
 			auto temp_dist = cv::norm(features_set.row(*i), features_set.row(j), 
 										cv::NORM_HAMMING); 
 			if(temp_dist < dist_to_center)
@@ -82,7 +83,6 @@ MatchingLibs::create_search_tree(cv::Mat features_set, tree<cv::Mat> &out_tree, 
     cout << "Creating hierarchical search structure, for ";
 	cout << features_set.size().height << " features" <<  endl;
 	*/
-	tree<cv::Mat>::pre_order_iterator newPos = pos;
 	int feat_amount = features_set.size().height;
 
 	if(feat_amount < max_leaves)
@@ -94,7 +94,8 @@ MatchingLibs::create_search_tree(cv::Mat features_set, tree<cv::Mat> &out_tree, 
 	{	
 		// Pick "branch_factor" random points in dataset as centers
 		// and cluster around them
-		std::vector<int> rnd_centers = MatchingLibs::pick_unique_rnd(branch_factor, 0, feat_amount);
+		tree<cv::Mat>::pre_order_iterator newPos = pos;
+		std::vector<int> rnd_centers = MatchingLibs::pick_unique_rnd(branch_factor, 0, feat_amount-1);
 		std::map<int, cv::Mat> cnt_partition = MatchingLibs::partition_around_centers(rnd_centers, features_set);
 		// Iterate through partition map, create nodes and recursively call the function
 		std::map<int, cv::Mat>::iterator map_iter = cnt_partition.begin();
