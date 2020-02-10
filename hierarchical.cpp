@@ -6,7 +6,6 @@
 // Linear algebra library
 // #include <armadillo>
 
-
 using namespace std;
 // Armadillo
 // using namespace arma;
@@ -40,7 +39,13 @@ int main(int, char **)
 	// Test hierarchical tree strcuture
 	// cv::Mat skimmed = out_orb_feat; //(Range::all(), Range(1, 3)).clone(); // Skim features for testing purposes
 	// Test search
-	cv::Mat out = MatchingLibs::parallel_search(out_orb_feat, 5, 15, 4, out_orb_feat.row(57));
+	cv::Mat out = MatchingLibs::parallel_search(out_orb_feat, 5, 20, 4, 5, out_orb_feat.row(57));
+	std::cout << out.size().height << " matches obtained!" << std::endl;
+	for(int i = 0; i < out.size().height; i++)
+	{
+		std::cout << "Distance of the match to the query: ";
+		std::cout << cv::norm(out_orb_feat.row(57), out.row(i), cv::NORM_HAMMING) << std::endl;
+	}
 
 }
 

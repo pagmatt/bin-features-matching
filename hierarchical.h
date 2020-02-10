@@ -14,7 +14,7 @@ class MatchingLibs
 		static void
 		merge_mat(cv::Mat &dest, cv::Mat &cand);
 		static cv::Mat
-		parallel_search(cv::Mat features_set, int branch_factor, int max_leaves, int trees, cv::Mat query);
+		parallel_search(cv::Mat features_set, int branch_factor, int max_leaves, int trees, int max_out, cv::Mat query);
 		static void
 		traverse_search_tree(tree<cv::Mat> &s_tree, tree<cv::Mat>::iterator from, cv::Mat &found, cv::Mat query);
 		static tree<cv::Mat> 
@@ -108,7 +108,7 @@ MatchingLibs::partition_around_centers(std::vector<int> &centers_set, cv::Mat &f
 
 
 cv::Mat
-MatchingLibs::parallel_search(cv::Mat features_set, int branch_factor, int max_leaves, int trees, cv::Mat query)
+MatchingLibs::parallel_search(cv::Mat features_set, int branch_factor, int max_leaves, int trees, int max_out, cv::Mat query)
 {
 	// Create the search trees
 	std::vector<tree<cv::Mat>> tree_vec;
@@ -128,11 +128,27 @@ MatchingLibs::parallel_search(cv::Mat features_set, int branch_factor, int max_l
 	{
 		tree<cv::Mat>::pre_order_iterator out_iter = tree_vec_it->begin();
 		MatchingLibs::traverse_search_tree(*tree_vec_it, out_iter, found, query);
-		std::cout << found.size() << " matches found!" << std::endl;
 		tree_vec_it++;
 	}
-
-	return found;
+	// Return top K closest features to query
+	std::vector<int> distances;
+	for(int i = 0; i < found.size().height; i++)
+	{
+		distances.push_back(cv::norm(found.row(i), query, cv::NORM_HAMMING));
+	}
+	// Create vec containing indexes of elements
+	std::cout << found.size().height << " possible, unskimmed matches found!" << std::endl;
+	std::vector<int> sorted_idx(distances.size());
+	std::iota(std::begin(sorted_idx), std::end(sorted_idx), 0);
+	// Sort indexes, but comparing the distances
+	sort(sorted_idx.begin(), sorted_idx.end(), [&](int i,int j) {return distances[i]<distances[j];});
+	// Now, just enough to access elements pointed by first K sorted indexes
+	cv::Mat out;
+	for(int i = 0; i < max_out; i++)
+	{	
+		out.push_back(found.row(sorted_idx[i]));
+	}
+	return out;
 }
 
 
