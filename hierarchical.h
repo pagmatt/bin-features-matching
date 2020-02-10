@@ -1,9 +1,10 @@
-#include <algorithm>
+//#include <algorithm>
 #include <random>
 #include <string>
 #include <iostream>
 // STL-like tree implementation
 #include "tree.hh"
+#include <map> 
 // OpenCV data stuctures
 #include <opencv2/core/core.hpp>
 
@@ -16,7 +17,7 @@ class MatchingLibs
 		static std::vector<int>
 		pick_unique_rnd(int rnd_amount, int min, int max);
 		static tree<cv::Mat> 
-		partition_around_centers(std::vector<int> &centers_set, cv::Mat features_set);
+		partition_around_centers(std::vector<int> &centers_set, cv::Mat &features_set);
 };
 
 std::vector<int>
@@ -35,9 +36,11 @@ MatchingLibs::pick_unique_rnd(int rnd_amount, int min, int max)
 }
 
 tree<cv::Mat> 
-MatchingLibs::partition_around_centers(std::vector<int> &centers_set, cv::Mat features_set)
+MatchingLibs::partition_around_centers(std::vector<int> &centers_set, cv::Mat &features_set)
 {
+	std::map<int, cv::Mat> out_partition;
 	tree<cv::Mat> out_tree;
+	std::map<int, cv::Mat>::iterator map_it;
 	//std::cout << centers_set.size() << " centers";
 	for(int j=0; j<features_set.size().height; j++)
 	{	
@@ -54,8 +57,20 @@ MatchingLibs::partition_around_centers(std::vector<int> &centers_set, cv::Mat fe
 				dist_to_center = temp_dist;
 			}
 		}
+		// Insert element into the map
+		map_it = out_partition.find(lucky_index);
+		if(map_it != out_partition.end())
+		{
+			// Center already present, stack to its feature set
+			out_partition[lucky_index].push_back(features_set.row(j));
+		}
+		else
+		{
+			out_partition[lucky_index] = features_set.row(j);
+		}
 		//std::cout << lucky_index << " @ distance: " << dist_to_center << std::endl;
 	}
+
 	return out_tree;
 }
 
