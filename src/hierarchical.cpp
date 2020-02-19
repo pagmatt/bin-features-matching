@@ -12,35 +12,33 @@ using namespace std;
 // OpenCV
 using namespace cv;
 
+int const feat_to_compute = 100;
 int const max_features_to_search = 50;
 int const branching_factor = 5;
 int const max_leaves_amount = 5;
 int const trees_amount = 2;
 int const top_k_feat = 5;
+std::string ref_path = "../testing_dataset/img_ref.png";
 
 int main(int, char **)
 {
-	tree<string> tr;
-	tree<string>::iterator top, one, two, four, loc, banana;
-
-	// Packages check
-	// cout << "Armadillo version: " << arma_version::as_string() << endl;
 	// --- Orb features computation ---
 
-	cv::Mat src = cv::imread(samples::findFile("../Images_dataset/test.jpg"), IMREAD_GRAYSCALE );
+	cv::Mat src = cv::imread(samples::findFile(ref_path), IMREAD_GRAYSCALE );
     if (src.empty())
     {
         cout << "Could not open or find the image!\n" << endl;
         return -1;
     }
 	// Features computation
-	Ptr<ORB> orb_obj = ORB::create(200);
+
+	Ptr<ORB> orb_obj = ORB::create(feat_to_compute);
 	vector<KeyPoint>orb_points;
 	orb_obj->detect(src, orb_points);
-	cout << "Detected " << orb_points.size() << " keypoints!" << endl; 
+	//cout << "Detected " << orb_points.size() << " keypoints!" << endl; 
 	cv::Mat out_orb_feat;
 	orb_obj->compute(src, orb_points, out_orb_feat);
-	cout << "Computed " << out_orb_feat.size().height << " features!" << endl; 
+	//cout << "Computed " << out_orb_feat.size().height << " features!" << endl; 
 
 	// Test hierarchical tree strcuture
 	// cv::Mat skimmed = out_orb_feat; //(Range::all(), Range(1, 3)).clone(); // Skim features for testing purposes
