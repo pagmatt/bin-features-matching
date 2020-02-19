@@ -12,6 +12,12 @@ using namespace std;
 // OpenCV
 using namespace cv;
 
+int const max_features_to_search = 50;
+int const branching_factor = 5;
+int const max_leaves_amount = 5;
+int const trees_amount = 2;
+int const top_k_feat = 5;
+
 int main(int, char **)
 {
 	tree<string> tr;
@@ -39,14 +45,14 @@ int main(int, char **)
 	// Test hierarchical tree strcuture
 	// cv::Mat skimmed = out_orb_feat; //(Range::all(), Range(1, 3)).clone(); // Skim features for testing purposes
 	// Test search
-	cv::Mat out = MatchingLibs::parallel_search(out_orb_feat, 5, 20, 4, 5, out_orb_feat.row(57));
+	cv::Mat out = MatchingLibs::parallel_search(out_orb_feat, branching_factor, max_leaves_amount,
+													 trees_amount, max_features_to_search, top_k_feat, out_orb_feat.row(57));
 	std::cout << out.size().height << " matches obtained!" << std::endl;
 	for(int i = 0; i < out.size().height; i++)
 	{
 		std::cout << "Distance of the match to the query: ";
 		std::cout << cv::norm(out_orb_feat.row(57), out.row(i), cv::NORM_HAMMING) << std::endl;
 	}
-
 }
 
 

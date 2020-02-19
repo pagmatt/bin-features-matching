@@ -2,11 +2,12 @@
 #include <random>
 #include <string>
 #include <iostream>
+#include <map> 
 // STL-like tree implementation
 #include "tree.hh"
-#include <map> 
 // OpenCV data stuctures
 #include <opencv2/core/core.hpp>
+
 
 class MatchingLibs
 {
@@ -14,11 +15,14 @@ class MatchingLibs
 		static void
 		merge_mat(cv::Mat &dest, cv::Mat &cand);
 		static cv::Mat
-		parallel_search(cv::Mat features_set, int branch_factor, int max_leaves, int trees, int max_out, cv::Mat query);
+		parallel_search(cv::Mat features_set, int branch_factor, int max_leaves, int trees, 
+							int max_searched, int max_out, cv::Mat query);
 		static void
-		traverse_search_tree(tree<cv::Mat> &s_tree, tree<cv::Mat>::iterator from, cv::Mat &found, cv::Mat query);
+		traverse_search_tree(tree<cv::Mat> &s_tree, tree<cv::Mat>::iterator from, cv::Mat &found, 
+								std::vector<tree<cv::Mat>::pre_order_iterator> &refine_queue, cv::Mat query);
 		static tree<cv::Mat> 
-		create_search_tree(cv::Mat features_set, tree<cv::Mat> &out_tree, tree<cv::Mat>::pre_order_iterator pos, int branch_factor, int max_leaves);
+		create_search_tree(cv::Mat features_set, tree<cv::Mat> &out_tree, tree<cv::Mat>::pre_order_iterator pos, 
+								int branch_factor, int max_leaves);
 	private:
 		static std::vector<int>
 		pick_unique_rnd(int rnd_amount, int min, int max);
@@ -108,7 +112,8 @@ MatchingLibs::partition_around_centers(std::vector<int> &centers_set, cv::Mat &f
 
 
 cv::Mat
-MatchingLibs::parallel_search(cv::Mat features_set, int branch_factor, int max_leaves, int trees, int max_out, cv::Mat query)
+MatchingLibs::parallel_search(cv::Mat features_set, int branch_factor, int max_leaves, int trees, 
+								int max_searched, int max_out, cv::Mat query)
 {
 	// Create the search trees
 	std::vector<tree<cv::Mat>> tree_vec;
@@ -124,10 +129,20 @@ MatchingLibs::parallel_search(cv::Mat features_set, int branch_factor, int max_l
 	// Search
 	std::vector<tree<cv::Mat>>::iterator tree_vec_it = tree_vec.begin();
 	cv::Mat found;
+	std::vector<tree<cv::Mat>::pre_order_iterator> refine_queue;
+
 	while(tree_vec_it != tree_vec.end())
 	{
 		tree<cv::Mat>::pre_order_iterator out_iter = tree_vec_it->begin();
-		MatchingLibs::traverse_search_tree(*tree_vec_it, out_iter, found, query);
+		MatchingLibs::traverse_search_tree(*tree_vec_it, out_iter, found, refine_queue, query);
+		// Eventually refine the search
+		while(found.size().height < max_searched & refine_queue.size() > 0)
+		{
+			// Extract the closest unsearched node from the queue and recurse from there 
+			tree<cv::Mat>::pre_order_iterator refine_node = refine_queue.back();
+			refine_queue.pop_back();
+			MatchingLibs::traverse_search_tree(*tree_vec_it, refine_node, found, refine_queue, query);
+		}
 		tree_vec_it++;
 	}
 	// Return top K closest features to query
@@ -154,7 +169,8 @@ MatchingLibs::parallel_search(cv::Mat features_set, int branch_factor, int max_l
 
 
 void
-MatchingLibs::traverse_search_tree(tree<cv::Mat> &s_tree, tree<cv::Mat>::iterator from, cv::Mat &found, cv::Mat query)
+MatchingLibs::traverse_search_tree(tree<cv::Mat> &s_tree, tree<cv::Mat>::iterator from, cv::Mat &found, 
+									std::vector<tree<cv::Mat>::pre_order_iterator> &refine_queue, cv::Mat query)
 {
 
 	if(s_tree.number_of_children(from) <= 1)
@@ -180,7 +196,17 @@ MatchingLibs::traverse_search_tree(tree<cv::Mat> &s_tree, tree<cv::Mat>::iterato
 			}
 		}
 		// Recurse on such node
-		MatchingLibs::traverse_search_tree(s_tree, lucky_it, found, query);
+		MatchingLibs::traverse_search_tree(s_tree, lucky_it, found, refine_queue, query);
+		// Add the others to the recursion 
+		for(int i=0; i < s_tree.number_of_children(from); i++)
+		{
+			tree<cv::Mat>::pre_order_iterator unlucky_it = s_tree.child(from, i);
+			if(unlucky_it != lucky_it)
+			{
+				refine_queue.push_back(unlucky_it);
+			}
+		}
+
 	}
 }
 
