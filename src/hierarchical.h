@@ -23,6 +23,10 @@ class MatchingLibs
 		static tree<cv::Mat> 
 		create_search_tree(cv::Mat features_set, tree<cv::Mat> &out_tree, tree<cv::Mat>::pre_order_iterator pos, 
 								int branch_factor, int max_leaves);
+		// Utilities
+		static int
+		search_feature(cv::Mat features_set, cv::Mat target);
+
 	private:
 		static std::vector<int>
 		pick_unique_rnd(int rnd_amount, int min, int max);
@@ -210,6 +214,19 @@ MatchingLibs::traverse_search_tree(tree<cv::Mat> &s_tree, tree<cv::Mat>::iterato
 	}
 }
 
+int
+MatchingLibs::search_feature(cv::Mat features_set, cv::Mat target)
+{
+	int found{-1};
+	for(int i=0; i < features_set.size().height; i++)
+	{
+		if(cv::norm(target, features_set.row(i), cv::NORM_HAMMING) == 0)
+		{
+			found = i;
+		}
+	}
+	return found;
+}
 
 tree<cv::Mat> 
 MatchingLibs::create_search_tree(cv::Mat features_set, tree<cv::Mat> &out_tree, tree<cv::Mat>::pre_order_iterator pos, int branch_factor, int max_leaves)
