@@ -18,7 +18,8 @@ int const branching_factor = 5;
 int const max_leaves_amount = 5;
 int const trees_amount = 2;
 int const top_k_feat = 5;
-int const px_to_draw = 100;
+int const px_to_draw = 150;
+int const target_index = 6;
 std::string ref_path = "../testing_dataset/img_ref.png";
 std::string target_path = "../testing_dataset/img1.png"; // number can be set in [1,5]
 
@@ -63,28 +64,35 @@ int main(int, char **)
 
 	// Search for similar features
 	cv::Mat out = MatchingLibs::parallel_search(dest_out_orb_feat, branching_factor, max_leaves_amount,
-													 trees_amount, max_features_to_search, top_k_feat, src_out_orb_feat.row(57));
+													 trees_amount, max_features_to_search, top_k_feat, src_out_orb_feat.row(target_index));
 	std::cout << out.size().height << " matches obtained!" << std::endl;
 	for(int i = 0; i < out.size().height; i++)
 	{
 		std::cout << "Distance of the match to the query: ";
-		std::cout << cv::norm(src_out_orb_feat.row(57), out.row(i), cv::NORM_HAMMING) << std::endl;
+		std::cout << cv::norm(src_out_orb_feat.row(target_index), out.row(i), cv::NORM_HAMMING) << std::endl;
 	}
 
 	// Visualize search results: target feature
-	Point2f src_kp = src_orb_points[57].pt; // Get coord of src keypoint
+	Point2f src_kp = src_orb_points[target_index].pt; // Get coord of src keypoint
 	cv::Rect src_to_crop(src_kp.x - px_to_draw/2, src_kp.y - px_to_draw/2, px_to_draw, px_to_draw); // x_start, y_start, width, height
 	cv::Mat src_crop = src(src_to_crop);
-	cv::imshow("Source", src_crop);
+	//cv::imshow("Source", src_crop);
 	// Visualize search results: feature match
 	// Must find the index in the original matrix, in order to associate feature to its descriptor
 	
 	Point2f dest_kp = dest_orb_points[MatchingLibs::search_feature(dest_out_orb_feat, out.row(0))].pt; // Get coord of matched, closest feature
 	cv::Rect dst_to_crop(dest_kp.x - px_to_draw/2, dest_kp.y - px_to_draw/2, px_to_draw, px_to_draw); // x_start, y_start, width, height
 	cv::Mat dest_crop = dest(dst_to_crop);
-	cv::imshow("Match", dest_crop);
+	//cv::imshow("Match", dest_crop);
+
+	//std::cout << CV_MAT_TYPE(src_crop.type()) << std::endl;
+	// Stack target and match and show them
+	cv::Mat stacked_orb = cv::Mat::zeros(px_to_draw, px_to_draw*3, CV_8U); // Create stacked image canvas
+	stacked_orb.setTo((cv::Scalar(255,255,255))); // Make it white
+	src_crop.copyTo(stacked_orb.colRange(1, px_to_draw+1));
+	dest_crop.copyTo(stacked_orb.colRange(2*px_to_draw, 3*px_to_draw));
+	cv::imshow("Stacked", stacked_orb);
 	cv::waitKey(0);
-	
 
 }
 
