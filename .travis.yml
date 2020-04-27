@@ -1,0 +1,21 @@
+name: C++ CI
+
+language: cpp
+dist: bionic
+sudo: require
+
+compiler:
+  - gcc
+
+before_script:
+  # switch to build directory
+  - cd build
+  # run cmake; here we assume that the project's
+  # top-level CMakeLists.txt is located at '..'
+  - cmake ..
+
+script:
+  # once CMake has done its job we just build using make as usual
+  - make
+  # if the project uses ctest we can run the tests like this
+  - make test
