@@ -13,30 +13,31 @@ class MatchingLibs
 {
 	public:
 		static void
-		merge_mat(cv::Mat &dest, cv::Mat &cand);
+		merge_mat (cv::Mat &dest, cv::Mat &cand);
 		static cv::Mat
-		parallel_search(cv::Mat features_set, int branch_factor, int max_leaves, int trees, 
+		parallel_search (cv::Mat features_set, int branch_factor, int max_leaves, int trees, 
 							int max_searched, int max_out, cv::Mat query);
 		static void
-		traverse_search_tree(tree<cv::Mat> &s_tree, tree<cv::Mat>::iterator from, cv::Mat &found, 
+		traverse_search_tree (tree<cv::Mat> &s_tree, tree<cv::Mat>::iterator from, cv::Mat &found, 
 								std::vector<tree<cv::Mat>::pre_order_iterator> &refine_queue, cv::Mat query);
 		static tree<cv::Mat> 
-		create_search_tree(cv::Mat features_set, tree<cv::Mat> &out_tree, tree<cv::Mat>::pre_order_iterator pos, 
+		create_search_tree (cv::Mat features_set, tree<cv::Mat> &out_tree, tree<cv::Mat>::pre_order_iterator pos, 
 								int branch_factor, int max_leaves);
+
 		// Utilities
 		static int
-		search_feature(cv::Mat features_set, cv::Mat target);
+		search_feature (cv::Mat features_set, cv::Mat target);
 
 	private:
 		static std::vector<int>
-		pick_unique_rnd(int rnd_amount, int min, int max);
+		pick_unique_rnd (int rnd_amount, int min, int max);
 		static std::map<int, cv::Mat>
-		partition_around_centers(std::vector<int> &centers_set, cv::Mat &features_set);
+		partition_around_centers (std::vector<int> &centers_set, cv::Mat &features_set);
 
 };
 
 void
-MatchingLibs::merge_mat(cv::Mat &dest, cv::Mat &cand)
+MatchingLibs::merge_mat (cv::Mat &dest, cv::Mat &cand)
 {
 	for(int i = 0; i < cand.size().height; i++)
 	{
@@ -57,7 +58,7 @@ MatchingLibs::merge_mat(cv::Mat &dest, cv::Mat &cand)
 }
 
 std::vector<int>
-MatchingLibs::pick_unique_rnd(int rnd_amount, int min, int max)
+MatchingLibs::pick_unique_rnd (int rnd_amount, int min, int max)
 {
 	std::random_device r;
 	std::set<int> rnd_set = std::set<int>();
@@ -75,7 +76,7 @@ MatchingLibs::pick_unique_rnd(int rnd_amount, int min, int max)
 
 
 std::map<int, cv::Mat>
-MatchingLibs::partition_around_centers(std::vector<int> &centers_set, cv::Mat &features_set)
+MatchingLibs::partition_around_centers (std::vector<int> &centers_set, cv::Mat &features_set)
 {
 	std::map<int, cv::Mat> out_partition;
 	tree<cv::Mat> out_tree;
@@ -116,7 +117,7 @@ MatchingLibs::partition_around_centers(std::vector<int> &centers_set, cv::Mat &f
 
 
 cv::Mat
-MatchingLibs::parallel_search(cv::Mat features_set, int branch_factor, int max_leaves, int trees, 
+MatchingLibs::parallel_search (cv::Mat features_set, int branch_factor, int max_leaves, int trees, 
 								int max_searched, int max_out, cv::Mat query)
 {
 	// Create the search trees
@@ -173,7 +174,7 @@ MatchingLibs::parallel_search(cv::Mat features_set, int branch_factor, int max_l
 
 
 void
-MatchingLibs::traverse_search_tree(tree<cv::Mat> &s_tree, tree<cv::Mat>::iterator from, cv::Mat &found, 
+MatchingLibs::traverse_search_tree (tree<cv::Mat> &s_tree, tree<cv::Mat>::iterator from, cv::Mat &found, 
 									std::vector<tree<cv::Mat>::pre_order_iterator> &refine_queue, cv::Mat query)
 {
 
@@ -200,7 +201,7 @@ MatchingLibs::traverse_search_tree(tree<cv::Mat> &s_tree, tree<cv::Mat>::iterato
 			}
 		}
 		// Recurse on such node
-		MatchingLibs::traverse_search_tree(s_tree, lucky_it, found, refine_queue, query);
+		MatchingLibs::traverse_search_tree (s_tree, lucky_it, found, refine_queue, query);
 		// Add the others to the recursion 
 		for(int i=0; i < s_tree.number_of_children(from); i++)
 		{
@@ -215,7 +216,7 @@ MatchingLibs::traverse_search_tree(tree<cv::Mat> &s_tree, tree<cv::Mat>::iterato
 }
 
 int
-MatchingLibs::search_feature(cv::Mat features_set, cv::Mat target)
+MatchingLibs::search_feature (cv::Mat features_set, cv::Mat target)
 {
 	int found{-1};
 	for(int i=0; i < features_set.size().height; i++)
@@ -229,7 +230,7 @@ MatchingLibs::search_feature(cv::Mat features_set, cv::Mat target)
 }
 
 tree<cv::Mat> 
-MatchingLibs::create_search_tree(cv::Mat features_set, tree<cv::Mat> &out_tree, tree<cv::Mat>::pre_order_iterator pos, int branch_factor, int max_leaves)
+MatchingLibs::create_search_tree (cv::Mat features_set, tree<cv::Mat> &out_tree, tree<cv::Mat>::pre_order_iterator pos, int branch_factor, int max_leaves)
 {
 	/* Inform user of tree creation
     cout << "Creating hierarchical search structure, for ";
@@ -262,3 +263,5 @@ MatchingLibs::create_search_tree(cv::Mat features_set, tree<cv::Mat> &out_tree, 
 	}
 	return out_tree;
 }
+
+
