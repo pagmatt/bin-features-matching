@@ -1,13 +1,14 @@
-name: C++ CI
+name: C/C++ CI
 
 language: cpp
+os: linux
 dist: bionic
-sudo: require
 
 compiler:
   - gcc
 
 before_script:
+  - mkdir build
   # switch to build directory
   - cd build
   # run cmake; here we assume that the project's
