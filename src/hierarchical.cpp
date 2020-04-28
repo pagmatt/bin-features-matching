@@ -20,6 +20,7 @@ int const trees_amount = 2;
 int const top_k_feat = 2;	// Extract just top 2, in order to use NNDR technique
 int const px_to_draw = 150;
 int const gap = 30;
+float const max_nndr_ratio = 0.8;
 std::string ref_path = "../testing_dataset/img_ref.png";
 std::string target_path = "../testing_dataset/img2.png"; // number can be set in [1,5]
 
@@ -75,6 +76,8 @@ find_ORB_matches (cv::Mat &src, cv::Mat &dest)
 										 px_to_draw*3, CV_8U); // Create stacked image canvas
 	stacked_orb.setTo((cv::Scalar(255,255,255))); // Make it white
 
+	unsigned valid_feat = 0;	// Keeps track of how many valid features we have matched up to now
+
 	// Search for similar features
 	for(int j = 0; j < feat_to_compute; j++)	// TODO: 5 -> feat-to-compute
 	{
@@ -86,7 +89,15 @@ find_ORB_matches (cv::Mat &src, cv::Mat &dest)
 		{
 			std::cout << "Distance of the match to the query: ";
 			std::cout << cv::norm(src_out_orb_feat.row(j), out.row(i), cv::NORM_HAMMING) << std::endl;
+		}	
+
+		// Nearest Neighbour Distance Ratio (NNDR) to skim the matches and keep only the best ones
+		if(cv::norm(src_out_orb_feat.row(j), out.row(0), cv::NORM_HAMMING)/
+			cv::norm(src_out_orb_feat.row(j), out.row(1), cv::NORM_HAMMING) < max_nndr_ratio)
+		{
+			continue;
 		}
+		valid_feat++;
 
 		// Visualize search results: target feature
 		Point2f src_kp = src_orb_points[j].pt; // Get coord of src keypoint
@@ -110,6 +121,8 @@ find_ORB_matches (cv::Mat &src, cv::Mat &dest)
 									px_to_draw + (gap+px_to_draw)*j));
 	}
 
+
+	std::cout << valid_feat << " valid matches found!" << std::endl;
 	return stacked_orb;
 }
 
