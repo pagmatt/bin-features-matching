@@ -21,7 +21,7 @@ int const top_k_feat = 2;	// Extract just top 2, in order to use NNDR technique
 int const px_to_draw = 150;
 int const gap = 30;
 std::string ref_path = "../testing_dataset/img_ref.png";
-std::string target_path = "../testing_dataset/img1.png"; // number can be set in [1,5]
+std::string target_path = "../testing_dataset/img2.png"; // number can be set in [1,5]
 
 cv::Mat
 find_ORB_matches (cv::Mat &src, cv::Mat &dest);
@@ -65,10 +65,10 @@ find_ORB_matches (cv::Mat &src, cv::Mat &dest)
 
 	Ptr<ORB> dest_orb_obj = ORB::create(feat_to_compute);
 	vector<KeyPoint>dest_orb_points;
-	dest_orb_obj->detect(src, dest_orb_points);
+	dest_orb_obj->detect(dest, dest_orb_points);
 	//cout << "Detected " << orb_points.size() << " keypoints!" << endl; 
 	cv::Mat dest_out_orb_feat;
-	dest_orb_obj->compute(src, dest_orb_points, dest_out_orb_feat);
+	dest_orb_obj->compute(dest, dest_orb_points, dest_out_orb_feat);
 
 	// Output image
 	cv::Mat stacked_orb = cv::Mat::zeros(px_to_draw*feat_to_compute + gap*(feat_to_compute - 1),
@@ -78,7 +78,6 @@ find_ORB_matches (cv::Mat &src, cv::Mat &dest)
 	// Search for similar features
 	for(int j = 0; j < feat_to_compute; j++)	// TODO: 5 -> feat-to-compute
 	{
-		std::cout << j << std::endl;
 		cv::Mat out = MatchingLibs::parallel_search(dest_out_orb_feat, branching_factor, max_leaves_amount, trees_amount, 
 													max_features_to_search, top_k_feat, src_out_orb_feat.row(j));
 
@@ -104,11 +103,11 @@ find_ORB_matches (cv::Mat &src, cv::Mat &dest)
 		// Stack target and match and show them
 		//cv::Mat stacked_orb = cv::Mat::zeros(px_to_draw, px_to_draw*3, CV_8U); // Create stacked image canvas
 		//stacked_orb.setTo((cv::Scalar(255,255,255))); // Make it white
-		src_crop.copyTo(stacked_orb.colRange(1, px_to_draw+1).rowRange(1+(gap+px_to_draw)*j, 
-									px_to_draw+1 + (gap+px_to_draw)*j));
-		dest_crop.copyTo(stacked_orb.colRange(2*px_to_draw, 3*px_to_draw).rowRange(1+(gap+px_to_draw)*j, 
-									px_to_draw+1 + (gap+px_to_draw)*j));
-
+ 
+		src_crop.copyTo(stacked_orb.colRange(1, px_to_draw+1).rowRange((gap+px_to_draw)*j, 
+									px_to_draw + (gap+px_to_draw)*j));
+		dest_crop.copyTo(stacked_orb.colRange(2*px_to_draw, 3*px_to_draw).rowRange((gap+px_to_draw)*j, 
+									px_to_draw + (gap+px_to_draw)*j));
 	}
 
 	return stacked_orb;
