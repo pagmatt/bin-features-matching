@@ -20,7 +20,7 @@ int const trees_amount = 2;
 int const top_k_feat = 2;	// Extract just top 2, in order to use NNDR technique
 int const px_to_draw = 150;
 int const gap = 30;
-float const max_nndr_ratio = 0.8;
+float const max_nndr_ratio = 0.85;
 std::string ref_path = "../testing_dataset/img_ref.png";
 std::string target_path = "../testing_dataset/img2.png"; // number can be set in [1,5]
 
@@ -48,7 +48,8 @@ int main(int, char **)
 	cv::Mat orb_matches = find_ORB_matches(src, dest);
 	// Features computation : ORB comparison
 
-	cv::imshow("ORB matches", orb_matches);
+	//cv::imshow("ORB matches", orb_matches);
+	cv::imwrite("orb_matches.jpeg", orb_matches);
 	cv::waitKey(0);
 
 }
@@ -97,11 +98,10 @@ find_ORB_matches (cv::Mat &src, cv::Mat &dest)
 		{
 			continue;
 		}
-		valid_feat++;
 
 		// Visualize search results: target feature
 		Point2f src_kp = src_orb_points[j].pt; // Get coord of src keypoint
-		cv::Rect src_to_crop(src_kp.x - px_to_draw/2, src_kp.y - px_to_draw/2, px_to_draw, px_to_draw); // x_start, y_start, width, height
+		cv::Rect src_to_crop(src_kp.x - px_to_draw/2, src_kp.y - px_to_draw/2, px_to_draw, px_to_draw); 
 		cv::Mat src_crop = src(src_to_crop);
 
 		// Visualize search results: feature match
@@ -115,13 +115,17 @@ find_ORB_matches (cv::Mat &src, cv::Mat &dest)
 		//cv::Mat stacked_orb = cv::Mat::zeros(px_to_draw, px_to_draw*3, CV_8U); // Create stacked image canvas
 		//stacked_orb.setTo((cv::Scalar(255,255,255))); // Make it white
  
-		src_crop.copyTo(stacked_orb.colRange(1, px_to_draw+1).rowRange((gap+px_to_draw)*j, 
-									px_to_draw + (gap+px_to_draw)*j));
-		dest_crop.copyTo(stacked_orb.colRange(2*px_to_draw, 3*px_to_draw).rowRange((gap+px_to_draw)*j, 
-									px_to_draw + (gap+px_to_draw)*j));
+		src_crop.copyTo(stacked_orb.colRange(1, px_to_draw+1).rowRange((gap+px_to_draw)*valid_feat, 
+									px_to_draw + (gap+px_to_draw)*valid_feat));
+		dest_crop.copyTo(stacked_orb.colRange(2*px_to_draw, 3*px_to_draw).rowRange((gap+px_to_draw)*valid_feat, 
+									px_to_draw + (gap+px_to_draw)*valid_feat));
+
+		valid_feat++;
 	}
 
-
+	// Crop and keep only portion of the image that is actually used
+	cv::Rect valid_crop(0, 0, stacked_orb.cols, valid_feat*(px_to_draw) + (valid_feat - 1)*gap);	// x_start, y_start, width, height
+	stacked_orb = stacked_orb(valid_crop);
 	std::cout << valid_feat << " valid matches found!" << std::endl;
 	return stacked_orb;
 }
