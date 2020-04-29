@@ -18,7 +18,7 @@ int const branching_factor = 5;
 int const max_leaves_amount = 5;
 int const trees_amount = 2;
 int const top_k_feat = 2;	// Extract just top 2, in order to use NNDR technique
-int const px_to_draw = 150;
+int const px_to_draw = 100;
 int const gap = 30;
 float const max_nndr_ratio = 0.85;
 std::string ref_path = "../testing_dataset/img_ref.png";
@@ -84,7 +84,6 @@ find_ORB_matches (cv::Mat &src, cv::Mat &dest)
 
 	unsigned valid_feat = 0;	// Keeps track of how many valid features we have matched up to now
 
-	std::cout << CV_MAT_TYPE(dest_out_orb_feat.type()) << " and " << CV_MAT_TYPE(src_out_orb_feat.type()) << std::endl;
 	// Search for similar features
 	for(int j = 0; j < feat_to_compute; j++)	// TODO: 5 -> feat-to-compute
 	{
@@ -109,12 +108,25 @@ find_ORB_matches (cv::Mat &src, cv::Mat &dest)
 		// Visualize search results: target feature
 		Point2f src_kp = src_orb_points[j].pt; // Get coord of src keypoint
 		cv::Rect src_to_crop(src_kp.x - px_to_draw/2, src_kp.y - px_to_draw/2, px_to_draw, px_to_draw); 
+		// Bounds might be cross image, if so skip
+		if(src_kp.x - px_to_draw/2 < 0 || src_kp.y - px_to_draw/2 < 0 || 
+			src_kp.x + px_to_draw/2 > src.rows || src_kp.y + px_to_draw/2 > src.cols)
+		{
+			std::cout << "Skipping feature as its keypoint exceeds image bounds" << std::endl;
+			continue;
+		}
 		cv::Mat src_crop = src(src_to_crop);
 
 		// Visualize search results: feature match
 		// Must find the index in the original matrix, in order to associate feature to its descriptor
 		Point2f dest_kp = dest_orb_points[MatchingLibs::search_feature(dest_out_orb_feat, out.row(0))].pt; // Get coord of matched, closest feature
 		cv::Rect dst_to_crop(dest_kp.x - px_to_draw/2, dest_kp.y - px_to_draw/2, px_to_draw, px_to_draw); // x_start, y_start, width, height
+		if(dest_kp.x - px_to_draw/2 < 0 || dest_kp.y - px_to_draw/2 < 0 || 
+			dest_kp.x + px_to_draw/2 > dest.rows || dest_kp.y + px_to_draw/2 > dest.cols)
+		{
+			std::cout << "Skipping feature as its keypoint exceeds image bounds" << std::endl;
+			continue;
+		}
 		cv::Mat dest_crop = dest(dst_to_crop);
 
 		//std::cout << CV_MAT_TYPE(src_crop.type()) << std::endl;
@@ -168,7 +180,6 @@ find_SIFT_matches (cv::Mat &src, cv::Mat &dest)
 	stacked_sift.setTo((cv::Scalar(255,255,255))); // Make it white
 
 	unsigned valid_feat = 0;	// Keeps track of how many valid features we have matched up to now
-	std::cout << CV_MAT_TYPE(quantized_dest_sift.type()) << " and " << CV_MAT_TYPE(quantized_src_sift.type()) << std::endl;
 	// Search for similar features
 	for(int j = 0; j < feat_to_compute; j++)	// TODO: 5 -> feat-to-compute
 	{
@@ -196,7 +207,7 @@ find_SIFT_matches (cv::Mat &src, cv::Mat &dest)
 		if(src_kp.x - px_to_draw/2 < 0 || src_kp.y - px_to_draw/2 < 0 || 
 			src_kp.x + px_to_draw/2 > src.rows || src_kp.y + px_to_draw/2 > src.cols)
 		{
-			std::cout << "Skipping feature as its keypoint not exceeds image bounds" << std::endl;
+			std::cout << "Skipping feature as its keypoint exceeds image bounds" << std::endl;
 			continue;
 		}
 		cv::Mat src_crop = src(src_to_crop);
@@ -204,6 +215,12 @@ find_SIFT_matches (cv::Mat &src, cv::Mat &dest)
 		// Must find the index in the original matrix, in order to associate feature to its descriptor
 		Point2f dest_kp = dest_sift_points[MatchingLibs::search_feature(quantized_dest_sift, out.row(0))].pt; // Get coord of matched, closest feature
 		cv::Rect dst_to_crop(dest_kp.x - px_to_draw/2, dest_kp.y - px_to_draw/2, px_to_draw, px_to_draw); // x_start, y_start, width, height
+		if(dest_kp.x - px_to_draw/2 < 0 || dest_kp.y - px_to_draw/2 < 0 || 
+			dest_kp.x + px_to_draw/2 > dest.rows || dest_kp.y + px_to_draw/2 > dest.cols)
+		{
+			std::cout << "Skipping feature as its keypoint exceeds image bounds" << std::endl;
+			continue;
+		}
 		cv::Mat dest_crop = dest(dst_to_crop);
 
 		//std::cout << CV_MAT_TYPE(src_crop.type()) << std::endl;
