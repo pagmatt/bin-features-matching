@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <map> 
+#include <bitset> 
 // STL-like tree implementation
 #include "tree.hh"
 // OpenCV data stuctures
@@ -159,7 +160,7 @@ MatchingLibs::parallel_search (cv::Mat features_set, int branch_factor, int max_
 		distances.push_back(cv::norm(found.row(i), query, cv::NORM_HAMMING));
 	}
 	// Create vec containing indexes of elements
-	std::cout << found.size().height << " possible, unskimmed matches found!" << std::endl;
+	//std::cout << found.size().height << " possible, unskimmed matches found!" << std::endl;
 	std::vector<int> sorted_idx(distances.size());
 	std::iota(std::begin(sorted_idx), std::end(sorted_idx), 0);
 	// Sort indexes, but comparing the distances
@@ -269,6 +270,7 @@ MatchingLibs::create_search_tree (cv::Mat features_set, tree<cv::Mat> &out_tree,
 cv::Mat
 MatchingLibs::median_quantize (cv::Mat &features_set)
 {
+	// Assumes that the features_set OpenCV type is 5, therefore the at<float>
 	// The smaller unit that cv::Mat allows is uint8, therefore 8 bits are grouped and then stored as 
 	// an entry of such cv::Mat 
 	cv::Mat quantized_feat = cv::Mat::zeros(features_set.rows, features_set.cols/8, CV_8U);		// One uint8 will store 8 bits
@@ -284,8 +286,19 @@ MatchingLibs::median_quantize (cv::Mat &features_set)
 		std::sort (feat_comp.begin(), feat_comp.end());
 		uint8_t median = feat_comp.at(feat_comp.size()/2) ;
 		//std::cout << "Median: " << (unsigned)median << std::endl;
-	}
 
+		for(int jCompMaj=0; jCompMaj<features_set.cols/8; jCompMaj++)
+		{
+			std::bitset<8> temp_entry;
+			for(int kCompMin=0; kCompMin<8; kCompMin++)
+			{	
+				uint8_t temp_comp = static_cast<uint8_t>(features_set.at<float>(iFeat, kCompMin + jCompMaj*8));
+				temp_entry.set(kCompMin, (temp_comp > median ? 1 : 0 ));
+			}
+			// Get bitset -> cv::Mat entry
+			quantized_feat.at<uchar>(iFeat, jCompMaj) = static_cast<uint8_t>(temp_entry.to_ulong());
+		}		
+	}
 
 	return quantized_feat;
 }
