@@ -24,6 +24,8 @@ class MatchingLibs
 		create_search_tree (cv::Mat features_set, tree<cv::Mat> &out_tree, tree<cv::Mat>::pre_order_iterator pos, 
 								int branch_factor, int max_leaves);
 
+		static cv::Mat
+		median_quantize (cv::Mat &features_set);
 		// Utilities
 		static int
 		search_feature (cv::Mat features_set, cv::Mat target);
@@ -262,6 +264,30 @@ MatchingLibs::create_search_tree (cv::Mat features_set, tree<cv::Mat> &out_tree,
 		}
 	}
 	return out_tree;
+}
+
+cv::Mat
+MatchingLibs::median_quantize (cv::Mat &features_set)
+{
+	// The smaller unit that cv::Mat allows is uint8, therefore 8 bits are grouped and then stored as 
+	// an entry of such cv::Mat 
+	cv::Mat quantized_feat = cv::Mat::zeros(features_set.rows, features_set.cols/8, CV_8U);		// One uint8 will store 8 bits
+	for(int iFeat=0; iFeat<features_set.rows; iFeat++)
+	{
+		// Find the median value of the components
+		std::vector<uint8_t> feat_comp = std::vector<uint8_t>();
+		for(int jComp=0; jComp<features_set.cols; jComp++)
+		{
+			uint8_t temp_comp = static_cast<uint8_t>(features_set.at<float>(iFeat, jComp));
+			feat_comp.push_back(temp_comp);
+		}
+		std::sort (feat_comp.begin(), feat_comp.end());
+		uint8_t median = feat_comp.at(feat_comp.size()/2) ;
+		//std::cout << "Median: " << (unsigned)median << std::endl;
+	}
+
+
+	return quantized_feat;
 }
 
 

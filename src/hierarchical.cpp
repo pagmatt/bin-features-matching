@@ -27,6 +27,9 @@ std::string target_path = "../testing_dataset/img2.png"; // number can be set in
 cv::Mat
 find_ORB_matches (cv::Mat &src, cv::Mat &dest);
 
+cv::Mat 
+find_SIFT_matches (cv::Mat &src, cv::Mat &dest);
+
 int main(int, char **)
 {
 
@@ -45,12 +48,13 @@ int main(int, char **)
         return -1;
     }
 
-	cv::Mat orb_matches = find_ORB_matches(src, dest);
+	//cv::Mat orb_matches = find_ORB_matches(src, dest);
+	cv::Mat sift_matches = find_SIFT_matches(src, dest);
 	// Features computation : ORB comparison
 
 	//cv::imshow("ORB matches", orb_matches);
-	cv::imwrite("orb_matches.jpeg", orb_matches);
-	cv::waitKey(0);
+	//cv::imwrite("orb_matches.jpeg", orb_matches);
+	//cv::waitKey(0);
 
 }
 
@@ -131,7 +135,30 @@ find_ORB_matches (cv::Mat &src, cv::Mat &dest)
 }
 
 
+cv::Mat 
+find_SIFT_matches (cv::Mat &src, cv::Mat &dest)
+{
+	Ptr<SIFT> src_sift_obj = SIFT::create(feat_to_compute);
+	vector<KeyPoint>src_sift_points;
+	src_sift_obj->detect(src, src_sift_points);
+	//cout << "Detected " << src_sift_points.size() << " keypoints!" << endl; 
+	cv::Mat src_out_sift_feat;
+	src_sift_obj->compute(src, src_sift_points, src_out_sift_feat);
+	//cout << "Computed " << src_out_sift_feat.size().height << " features!" << endl; 
 
+	Ptr<SIFT> dest_sift_obj = SIFT::create(feat_to_compute);
+	vector<KeyPoint>dest_sift_points;
+	dest_sift_obj->detect(dest, dest_sift_points);
+	//cout << "Detected " << orb_points.size() << " keypoints!" << endl; 
+	cv::Mat dest_out_sift_feat;
+	dest_sift_obj->compute(dest, dest_sift_points, dest_out_sift_feat);
+
+	//Rows = #features, cols = # components, type is 32F
+	//std::cout << CV_MAT_TYPE(dest_out_sift_feat.type()) << std::endl;
+	//Quantize the features
+	cv::Mat quantized_feat = MatchingLibs::median_quantize (dest_out_sift_feat);
+	return cv::Mat::zeros(2, 2, CV_8U);
+}
 	
 
 
