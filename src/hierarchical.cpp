@@ -81,10 +81,12 @@ find_ORB_matches (cv::Mat &src, cv::Mat &dest)
 	stacked_orb.setTo((cv::Scalar(255,255,255))); // Make it white
 
 	unsigned valid_feat = 0;	// Keeps track of how many valid features we have matched up to now
+	unsigned skipped = 0;
 
 	// Search for similar features
 	for(int j = 0; j < feat_to_compute; j++)	// TODO: 5 -> feat-to-compute
 	{
+		
 		cv::Mat out = MatchingLibs::parallel_search(dest_out_orb_feat, branching_factor, max_leaves_amount, trees_amount, 
 													max_features_to_search, top_k_feat, src_out_orb_feat.row(j));
 
@@ -113,7 +115,7 @@ find_ORB_matches (cv::Mat &src, cv::Mat &dest)
 		if(src_kp.x - px_to_draw/2 < 0 || src_kp.y - px_to_draw/2 < 0 || 
 			src_kp.x + px_to_draw/2 > src.rows || src_kp.y + px_to_draw/2 > src.cols)
 		{
-			std::cout << "Skipping feature as its keypoint exceeds image bounds" << std::endl;
+			skipped++;
 			continue;
 		}
 		cv::Mat src_crop = src(src_to_crop);
@@ -147,6 +149,10 @@ find_ORB_matches (cv::Mat &src, cv::Mat &dest)
 	cv::Rect valid_crop(0, 0, stacked_orb.cols, valid_feat*(px_to_draw) + (valid_feat - 1)*gap);	// x_start, y_start, width, height
 	stacked_orb = stacked_orb(valid_crop);
 	std::cout << valid_feat << " valid ORB matches found!" << std::endl;
+	if(skipped > 0)
+	{
+		std::cout << "(skipped " << skipped << " features as their keypoins exceed image bounds)" << std::endl;
+	}
 	return stacked_orb;
 }
 
@@ -181,6 +187,7 @@ find_SIFT_matches (cv::Mat &src, cv::Mat &dest)
 	stacked_sift.setTo((cv::Scalar(255,255,255))); // Make it white
 
 	unsigned valid_feat = 0;	// Keeps track of how many valid features we have matched up to now
+	unsigned skipped = 0;
 	// Search for similar features
 	for(int j = 0; j < feat_to_compute; j++)	// TODO: 5 -> feat-to-compute
 	{
@@ -208,7 +215,7 @@ find_SIFT_matches (cv::Mat &src, cv::Mat &dest)
 		if(src_kp.x - px_to_draw/2 < 0 || src_kp.y - px_to_draw/2 < 0 || 
 			src_kp.x + px_to_draw/2 > src.rows || src_kp.y + px_to_draw/2 > src.cols)
 		{
-			std::cout << "Skipping feature as its keypoint exceeds image bounds" << std::endl;
+			skipped++;
 			continue;
 		}
 		cv::Mat src_crop = src(src_to_crop);
@@ -219,7 +226,7 @@ find_SIFT_matches (cv::Mat &src, cv::Mat &dest)
 		if(dest_kp.x - px_to_draw/2 < 0 || dest_kp.y - px_to_draw/2 < 0 || 
 			dest_kp.x + px_to_draw/2 > dest.rows || dest_kp.y + px_to_draw/2 > dest.cols)
 		{
-			std::cout << "Skipping feature as its keypoint exceeds image bounds" << std::endl;
+			skipped++;
 			continue;
 		}
 		cv::Mat dest_crop = dest(dst_to_crop);
@@ -241,6 +248,10 @@ find_SIFT_matches (cv::Mat &src, cv::Mat &dest)
 	cv::Rect valid_crop(0, 0, stacked_sift.cols, valid_feat*(px_to_draw) + (valid_feat - 1)*gap);	// x_start, y_start, width, height
 	stacked_sift = stacked_sift(valid_crop);
 	std::cout << valid_feat << " valid SIFT matches found!" << std::endl;
+	if(skipped > 0)
+	{
+		std::cout << "(skipped " << skipped << " features as their keypoins exceed image bounds)" << std::endl;
+	}
 
 	return stacked_sift;
 }

@@ -17,7 +17,7 @@ class MatchingLibs
 		static void
 		merge_mat (cv::Mat &dest, cv::Mat &cand);
 		static cv::Mat
-		parallel_search (cv::Mat features_set, int branch_factor, int max_leaves, int trees, 
+		parallel_search (cv::Mat &features_set, int branch_factor, int max_leaves, int trees, 
 							int max_searched, int max_out, cv::Mat query);
 		
 		static cv::Mat
@@ -27,14 +27,14 @@ class MatchingLibs
 		traverse_search_tree (tree<cv::Mat> &s_tree, tree<cv::Mat>::iterator from, cv::Mat &found, 
 								std::vector<tree<cv::Mat>::pre_order_iterator> &refine_queue, cv::Mat query);
 		static tree<cv::Mat> 
-		create_search_tree (cv::Mat features_set, tree<cv::Mat> &out_tree, tree<cv::Mat>::pre_order_iterator pos, 
+		create_search_tree (cv::Mat &features_set, tree<cv::Mat> &out_tree, tree<cv::Mat>::pre_order_iterator pos, 
 								int branch_factor, int max_leaves);
 
 		static cv::Mat
 		median_quantize (cv::Mat &features_set);
 		// Utilities
 		static int
-		search_feature (cv::Mat features_set, cv::Mat target);
+		search_feature (cv::Mat &features_set, cv::Mat target);
 
 	private:
 		static std::vector<int>
@@ -141,7 +141,7 @@ MatchingLibs::linear_search (cv::Mat features_set, cv::Mat query)
 }
 
 cv::Mat
-MatchingLibs::parallel_search (cv::Mat features_set, int branch_factor, int max_leaves, int trees, 
+MatchingLibs::parallel_search (cv::Mat &features_set, int branch_factor, int max_leaves, int trees, 
 								int max_searched, int max_out, cv::Mat query)
 {
 	// Create the search trees
@@ -240,7 +240,7 @@ MatchingLibs::traverse_search_tree (tree<cv::Mat> &s_tree, tree<cv::Mat>::iterat
 }
 
 int
-MatchingLibs::search_feature (cv::Mat features_set, cv::Mat target)
+MatchingLibs::search_feature (cv::Mat &features_set, cv::Mat target)
 {
 	int found{-1};
 	for(int i=0; i < features_set.size().height; i++)
@@ -254,7 +254,7 @@ MatchingLibs::search_feature (cv::Mat features_set, cv::Mat target)
 }
 
 tree<cv::Mat> 
-MatchingLibs::create_search_tree (cv::Mat features_set, tree<cv::Mat> &out_tree, tree<cv::Mat>::pre_order_iterator pos, int branch_factor, int max_leaves)
+MatchingLibs::create_search_tree (cv::Mat &features_set, tree<cv::Mat> &out_tree, tree<cv::Mat>::pre_order_iterator pos, int branch_factor, int max_leaves)
 {
 	/* Inform user of tree creation
     cout << "Creating hierarchical search structure, for ";
