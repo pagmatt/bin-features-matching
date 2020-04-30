@@ -1,0 +1,266 @@
+% This file was created by tikzplotlib v0.9.0.
+\begin{tikzpicture}
+\pgfplotsset{every tick label/.append style={font=\scriptsize}}
+
+\definecolor{color0}{rgb}{0.672058823529412,0.789705882352941,0.916176470588235}
+\definecolor{color1}{rgb}{0.938725490196078,0.718137254901961,0.571078431372549}
+\definecolor{color2}{rgb}{0.596078431372549,0.854901960784314,0.654901960784314}
+\definecolor{color3}{rgb}{0.349019607843137,0.490196078431372,0.749019607843137}
+\definecolor{color4}{rgb}{0.852941176470588,0.544117647058824,0.370588235294118}
+\definecolor{color5}{rgb}{0.46078431372549,0.749019607843137,0.443137254901961}
+
+\begin{axis}[
+width=0.951\fwidth,
+height=\fheight,
+at={(0\fwidth,0\fheight)},
+scale only axis,
+% axis line style={white!80!black},
+legend style={at={(0.5,0.05)}, anchor=south, draw=white!80!black, font=\footnotesize},
+legend columns=3,
+%tick align=outside,
+%x grid style={white!80!black},
+xlabel style={font=\footnotesize},
+xlabel={eMBB source rate [Mbit/s]},
+%xmajorticks=false,
+xmin=0.5, xmax=5.5,
+xtick style={color=white!15!black},
+xtick={0,1,2,3,4,5},
+xticklabels={60,80,100,120,140,160},
+%y grid style={white!80!black},
+ylabel style={font=\footnotesize},
+ylabel={$\eta$},
+ymajorgrids,
+%ymajorticks=false,
+ymin=0, ymax=1.04673150491806,
+ytick style={color=white!15!black},
+ytick={0,0.2,0.4,0.6,0.8,1,1.2},
+yticklabels={0.0,0.2,0.4,0.6,0.8,1.0,1.2}
+]
+\draw[draw=white,fill=color0] (axis cs:-0.4,0) rectangle (axis cs:-0.133333333333333,0.992092814909182);
+\addlegendimage{ybar,ybar legend,draw=white,fill=color0};
+\addlegendentry{no CA}
+
+\draw[draw=white,fill=color0] (axis cs:0.6,0) rectangle (axis cs:0.866666666666667,0.989618118431192);
+\draw[draw=white,fill=color0] (axis cs:1.6,0) rectangle (axis cs:1.86666666666667,0.992092814909182);
+\draw[draw=white,fill=color0] (axis cs:2.6,0) rectangle (axis cs:2.86666666666667,0.992128894231415);
+\draw[draw=white,fill=color0] (axis cs:3.6,0) rectangle (axis cs:3.86666666666667,0.993069264385168);
+\draw[draw=white,fill=color0] (axis cs:4.6,0) rectangle (axis cs:4.86666666666667,0.993169863782426);
+\draw[draw=white,fill=color1] (axis cs:-0.133333333333333,0) rectangle (axis cs:0.133333333333333,0.548587599256967);
+\addlegendimage{ybar,ybar legend,draw=white,fill=color1};
+\addlegendentry{CA, primary only}
+
+\draw[draw=white,fill=color1] (axis cs:0.866666666666667,0) rectangle (axis cs:1.13333333333333,0.550577977174035);
+\draw[draw=white,fill=color1] (axis cs:1.86666666666667,0) rectangle (axis cs:2.13333333333333,0.550738712565296);
+\draw[draw=white,fill=color1] (axis cs:2.86666666666667,0) rectangle (axis cs:3.13333333333333,0.550854753248398);
+\draw[draw=white,fill=color1] (axis cs:3.86666666666667,0) rectangle (axis cs:4.13333333333333,0.550690786417653);
+\draw[draw=white,fill=color1] (axis cs:4.86666666666667,0) rectangle (axis cs:5.13333333333333,0.550546898098854);
+\draw[draw=white,fill=color2] (axis cs:0.133333333333333,0) rectangle (axis cs:0.4,0.602499512053809);
+\addlegendimage{ybar,ybar legend,draw=white,fill=color2};
+\addlegendentry{CA, MilliSlice}
+
+\draw[draw=white,fill=color2] (axis cs:1.13333333333333,0) rectangle (axis cs:1.4,0.737528658840641);
+\draw[draw=white,fill=color2] (axis cs:2.13333333333333,0) rectangle (axis cs:2.4,0.859771041294504);
+\draw[draw=white,fill=color2] (axis cs:3.13333333333333,0) rectangle (axis cs:3.4,0.875528679541181);
+\draw[draw=white,fill=color2] (axis cs:4.13333333333333,0) rectangle (axis cs:4.4,0.863810005536515);
+\draw[draw=white,fill=color2] (axis cs:5.13333333333333,0) rectangle (axis cs:5.4,0.862716408560846);
+\draw[draw=white,fill=color3] (axis cs:-0.4,0) rectangle (axis cs:-0.133333333333333,0.942292742045529);
+\draw[draw=white,fill=color3] (axis cs:0.6,0) rectangle (axis cs:0.866666666666667,0.989618118431192);
+\draw[draw=white,fill=color3] (axis cs:1.6,0) rectangle (axis cs:1.86666666666667,0.992092814909182);
+\draw[draw=white,fill=color3] (axis cs:2.6,0) rectangle (axis cs:2.86666666666667,0.992128894231415);
+\draw[draw=white,fill=color3] (axis cs:3.6,0) rectangle (axis cs:3.86666666666667,0.993069264385168);
+\draw[draw=white,fill=color3] (axis cs:4.6,0) rectangle (axis cs:4.86666666666667,0.993169863782426);
+\draw[draw=white,fill=color4] (axis cs:-0.133333333333333,0) rectangle (axis cs:0.133333333333333,0.496928739093957);
+\draw[draw=white,fill=color4] (axis cs:0.866666666666667,0) rectangle (axis cs:1.13333333333333,0.498491071075273);
+\draw[draw=white,fill=color4] (axis cs:1.86666666666667,0) rectangle (axis cs:2.13333333333333,0.498529176288045);
+\draw[draw=white,fill=color4] (axis cs:2.86666666666667,0) rectangle (axis cs:3.13333333333333,0.498501809829591);
+\draw[draw=white,fill=color4] (axis cs:3.86666666666667,0) rectangle (axis cs:4.13333333333333,0.498481865874859);
+\draw[draw=white,fill=color4] (axis cs:4.86666666666667,0) rectangle (axis cs:5.13333333333333,0.498492214008562);
+\draw[draw=white,fill=color5] (axis cs:0.133333333333333,0) rectangle (axis cs:0.4,0.397810281778303);
+\draw[draw=white,fill=color5] (axis cs:1.13333333333333,0) rectangle (axis cs:1.4,0.401470208544146);
+\draw[draw=white,fill=color5] (axis cs:2.13333333333333,0) rectangle (axis cs:2.4,0.396993516577507);
+\draw[draw=white,fill=color5] (axis cs:3.13333333333333,0) rectangle (axis cs:3.4,0.376207185919393);
+\draw[draw=white,fill=color5] (axis cs:4.13333333333333,0) rectangle (axis cs:4.4,0.364317205077818);
+\draw[draw=white,fill=color5] (axis cs:5.13333333333333,0) rectangle (axis cs:5.4,0.363246300149904);
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+-0.266666666666667 0.9332371523162
+-0.266666666666667 0.951077601072068
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+0.733333333333333 0.984239805463654
+0.733333333333333 0.994068973893129
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+1.73333333333333 0.987269330671303
+1.73333333333333 0.995889520874245
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+2.73333333333333 0.987538611784725
+2.73333333333333 0.995964828464495
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+3.73333333333333 0.988388946794162
+3.73333333333333 0.997110019937398
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+4.73333333333333 0.988220125258159
+4.73333333333333 0.996841444914414
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+0 0.547985692161577
+0 0.549191532364858
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+1 0.549951913727147
+1 0.551165099500968
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+2 0.550152684032459
+2 0.551333905412074
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+3 0.550204394362594
+3 0.551557189046678
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+4 0.549993895881644
+4 0.551360362806118
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+5 0.550010180035272
+5 0.551096422950592
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+0.266666666666667 0.593209995316784
+0.266666666666667 0.611259569641783
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+1.26666666666667 0.725963408056759
+1.26666666666667 0.74837595505422
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+2.26666666666667 0.849043174163283
+2.26666666666667 0.869675404363367
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+3.26666666666667 0.865562279694479
+3.26666666666667 0.885932395059632
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+4.26666666666667 0.853691505111957
+4.26666666666667 0.873070567633758
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+5.26666666666667 0.85267480911005
+5.26666666666667 0.871870366437369
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+-0.266666666666667 0.932908756855312
+-0.266666666666667 0.951400907436388
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+0.733333333333333 0.984135890712934
+0.733333333333333 0.993908005859357
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+1.73333333333333 0.987150079643422
+1.73333333333333 0.995863689678081
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+2.73333333333333 0.987314695986906
+2.73333333333333 0.995795223095308
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+3.73333333333333 0.987901482018509
+3.73333333333333 0.99673259126327
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+4.73333333333333 0.988497805425288
+4.73333333333333 0.996739219574231
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+0 0.496603488323481
+0 0.497232360943184
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+1 0.498183908246141
+1 0.498720442893143
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+2 0.498236787451846
+2 0.4987663021546
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+3 0.498200290484289
+3 0.498738863526165
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+4 0.498156775598968
+4 0.498713638841792
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+5 0.498162799621475
+5 0.49872987012643
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+0.266666666666667 0.387279651447193
+0.266666666666667 0.4079534431906
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+1.26666666666667 0.391036048296791
+1.26666666666667 0.41166274058931
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+2.26666666666667 0.385480684538739
+2.26666666666667 0.406868385904831
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+3.26666666666667 0.364632167874085
+3.26666666666667 0.386644918362843
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+4.26666666666667 0.354521716826154
+4.26666666666667 0.373983169353826
+};
+\addplot [line width=1.08pt, white!26!black, forget plot]
+table {%
+5.26666666666667 0.353511012431963
+5.26666666666667 0.372467765357614
+};
+\end{axis}
+
+\end{tikzpicture}

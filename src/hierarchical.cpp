@@ -12,10 +12,10 @@ using namespace std;
 // OpenCV
 using namespace cv;
 
-int const feat_to_compute = 50;
-int const max_features_to_search = 25;
+int const feat_to_compute = 200;
+int const max_features_to_search = 50;
 int const branching_factor = 5;
-int const max_leaves_amount = 20;
+int const max_leaves_amount = 10;
 int const trees_amount = 1;
 int const top_k_feat = 2;	// Extract just top 2, enough in order to use NNDR technique
 int const px_to_draw = 100;
@@ -56,17 +56,18 @@ int main(int, char **)
 
 	// Compute matches
 
-	
+	/*
 	cv::Mat orb_matches = find_ORB_matches(src, dest);
 	cv::Mat sift_matches = find_SIFT_matches(src, dest);
 	// Features computation : ORB comparison
 
 	cv::imwrite("../orb_matches.jpeg", orb_matches);
 	cv::imwrite("../sift_matches.jpeg", sift_matches);
-	
+	*/
 
 	// Profile code
-	//profile_orb(src, dest, false);
+	profile_orb(src, dest, true);
+	//profile_sift(src, dest);
 
 }
 

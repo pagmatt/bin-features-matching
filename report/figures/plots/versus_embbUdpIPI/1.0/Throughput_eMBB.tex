@@ -1,0 +1,137 @@
+% This file was created by tikzplotlib v0.9.0.
+\begin{tikzpicture}
+\pgfplotsset{every tick label/.append style={font=\scriptsize}}
+
+\definecolor{color0}{rgb}{0.12156862745098,0.466666666666667,0.705882352941177}
+\definecolor{color1}{rgb}{1,0.498039215686275,0.0549019607843137}
+\definecolor{color2}{rgb}{0.172549019607843,0.627450980392157,0.172549019607843}
+
+\begin{axis}[
+width=0.951\fwidth,
+height=\fheight,
+at={(0\fwidth,0\fheight)},
+scale only axis,
+%axis line style={white!80!black},
+legend style={at={(0.5,0.95)}, anchor=south, draw=white!80!black, font=\footnotesize},
+legend columns=3,
+%tick align=outside,
+%x grid style={white!80!black},
+xlabel style={font=\footnotesize},
+xlabel={eMBB source rate [Mbit/s]},
+xmajorgrids,
+%xmajorticks=false,
+xmin=77.265, xmax=163.635,
+xtick style={color=white!15!black},
+%y grid style={white!80!black},
+ylabel shift = -3 pt,
+ylabel style={font=\footnotesize},
+ylabel={eMBB throughput [Mbit/s]},
+ymajorgrids,
+%ymajorticks=false,
+ymin=25, ymax=122.421680544278,
+ytick style={color=white!15!black}
+]
+\path [draw=color0, semithick]
+(axis cs:59.8,54.8024843130435)
+--(axis cs:59.8,57.1824232626087);
+
+\path [draw=color0, semithick]
+(axis cs:80.3,66.2646864139131)
+--(axis cs:80.3,70.4274191582609);
+
+\path [draw=color0, semithick]
+(axis cs:99.9,75.3266220521739)
+--(axis cs:99.9,80.6574616486956);
+
+\path [draw=color0, semithick]
+(axis cs:120.5,82.0036189495652)
+--(axis cs:120.5,88.507896653913);
+
+\path [draw=color0, semithick]
+(axis cs:138.8,84.0303947686957)
+--(axis cs:138.8,90.6846110052174);
+
+\path [draw=color0, semithick]
+(axis cs:160.6,83.7835675826087)
+--(axis cs:160.6,90.7035636869565);
+
+\path [draw=color1, semithick]
+(axis cs:59.8,46.285181106087)
+--(axis cs:59.8,49.3391595965217);
+
+\path [draw=color1, semithick]
+(axis cs:80.3,47.7442085843478)
+--(axis cs:80.3,51.1405993182609);
+
+\path [draw=color1, semithick]
+(axis cs:99.9,47.4526541913043)
+--(axis cs:99.9,50.8956315826087);
+
+\path [draw=color1, semithick]
+(axis cs:120.5,47.3495055582609)
+--(axis cs:120.5,50.7744089043478);
+
+\path [draw=color1, semithick]
+(axis cs:138.8,47.2815538086957)
+--(axis cs:138.8,50.5375249808696);
+
+\path [draw=color1, semithick]
+(axis cs:160.6,47.0092221217391)
+--(axis cs:160.6,50.5135682782609);
+
+\path [draw=color2, semithick]
+(axis cs:59.8,59.7632309426087)
+--(axis cs:59.8,59.7706580591304);
+
+\path [draw=color2, semithick]
+(axis cs:80.3,80.1840766886957)
+--(axis cs:80.3,80.2727635478261);
+
+\path [draw=color2, semithick]
+(axis cs:99.9,97.8606320417391)
+--(axis cs:99.9,99.2896002226087);
+
+\path [draw=color2, semithick]
+(axis cs:120.5,102.926477801739)
+--(axis cs:120.5,108.264461133913);
+
+\path [draw=color2, semithick]
+(axis cs:138.8,102.655557008696)
+--(axis cs:138.8,108.207075951304);
+
+\path [draw=color2, semithick]
+(axis cs:160.6,102.681992236522)
+--(axis cs:160.6,108.039430233043);
+\addplot [semithick, color0, dash pattern=on 1pt off 1pt, mark=square*, mark size=2, mark options={solid,draw=white}]
+table {%
+% 59.8 55.9949824
+80.3 68.3525342608696
+99.9 78.0235019130435
+120.5 85.282459826087
+138.8 87.2465541565217
+160.6 87.0813428869565
+};
+\addlegendentry{no CA}
+\addplot [semithick, color1, mark=*, mark size=2, mark options={solid,draw=white}]
+table {%
+% 59.8 47.8266501565217
+80.3 49.3832815304348
+99.9 49.2690298434783
+120.5 49.0975410086956
+138.8 48.9396313043478
+160.6 48.7378053565217
+};
+\addlegendentry{CA, primary only}
+\addplot [semithick, color2, dash pattern=on 4pt off 1.5pt, mark=triangle*, mark size=3, mark options={solid,rotate=180,draw=white}]
+table {%
+% 59.8 59.7673093565217
+80.3 80.2352528695652
+99.9 98.6156165565217
+120.5 105.604354226087
+138.8 105.519246469565
+160.6 105.305933913043
+};
+\addlegendentry{CA, MilliSlice}
+\end{axis}
+
+\end{tikzpicture}

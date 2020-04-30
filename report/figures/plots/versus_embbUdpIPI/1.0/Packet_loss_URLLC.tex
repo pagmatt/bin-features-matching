@@ -1,0 +1,120 @@
+% This file was created by tikzplotlib v0.9.0.
+\begin{tikzpicture}
+
+\definecolor{color0}{rgb}{0.12156862745098,0.466666666666667,0.705882352941177}
+\definecolor{color1}{rgb}{1,0.498039215686275,0.0549019607843137}
+\definecolor{color2}{rgb}{0.172549019607843,0.627450980392157,0.172549019607843}
+
+\begin{axis}[
+axis line style={white!80!black},
+legend cell align={left},
+legend style={fill opacity=0.8, draw opacity=1, text opacity=1, at={(0.5,0.09)}, anchor=south, draw=white!80!black},
+tick align=outside,
+x grid style={white!80!black},
+xlabel={eMBB source rate [Mbit/s]},
+xmajorgrids,
+xmajorticks=false,
+xmin=96.865, xmax=163.635,
+xtick style={color=white!15!black},
+y grid style={white!80!black},
+ylabel={Packet loss },
+ymajorgrids,
+ymajorticks=false,
+ymin=-0.055, ymax=0.055,
+ytick style={color=white!15!black},
+ytick={-0.06,-0.04,-0.02,0,0.02,0.04,0.06},
+yticklabels={−0.06,−0.04,−0.02,0.00,0.02,0.04,0.06}
+]
+\path [draw=color0, semithick]
+(axis cs:99.9,0)
+--(axis cs:99.9,0);
+
+\path [draw=color0, semithick]
+(axis cs:120.5,0)
+--(axis cs:120.5,0);
+
+\path [draw=color0, semithick]
+(axis cs:138.8,0)
+--(axis cs:138.8,0);
+
+\path [draw=color0, semithick]
+(axis cs:160.6,0)
+--(axis cs:160.6,0);
+
+\path [draw=color1, semithick]
+(axis cs:99.9,0)
+--(axis cs:99.9,0);
+
+\path [draw=color1, semithick]
+(axis cs:120.5,0)
+--(axis cs:120.5,0);
+
+\path [draw=color1, semithick]
+(axis cs:138.8,0)
+--(axis cs:138.8,0);
+
+\path [draw=color1, semithick]
+(axis cs:160.6,0)
+--(axis cs:160.6,0);
+
+\path [draw=color2, semithick]
+(axis cs:99.9,0)
+--(axis cs:99.9,0);
+
+\path [draw=color2, semithick]
+(axis cs:120.5,0)
+--(axis cs:120.5,0);
+
+\path [draw=color2, semithick]
+(axis cs:138.8,0)
+--(axis cs:138.8,0);
+
+\path [draw=color2, semithick]
+(axis cs:160.6,0)
+--(axis cs:160.6,0);
+
+\addplot [semithick, color0, dash pattern=on 1pt off 1pt, mark=square*, mark size=3, mark options={solid,draw=white}, forget plot]
+table {%
+99.9 0
+120.5 0
+138.8 0
+160.6 0
+};
+\addplot [semithick, color1, mark=*, mark size=3, mark options={solid,draw=white}, forget plot]
+table {%
+99.9 0
+120.5 0
+138.8 0
+160.6 0
+};
+\addplot [semithick, color2, dash pattern=on 4pt off 1.5pt, mark=triangle*, mark size=3, mark options={solid,rotate=180,draw=white}, forget plot]
+table {%
+99.9 0
+120.5 0
+138.8 0
+160.6 0
+};
+\addplot [semithick, color0, forget plot]
+table {%
+99.9 0
+120.5 0
+138.8 0
+160.6 0
+};
+\addplot [semithick, color1, forget plot]
+table {%
+99.9 0
+120.5 0
+138.8 0
+160.6 0
+};
+\addplot [semithick, color2, forget plot]
+table {%
+99.9 0
+120.5 0
+138.8 0
+160.6 0
+};
+\end{axis}
+
+\end{tikzpicture}
