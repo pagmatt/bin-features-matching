@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map> 
 #include <bitset> 
+#include <algorithm>
 // STL-like tree implementation
 #include "tree.hh"
 // OpenCV data stuctures
@@ -18,6 +19,10 @@ class MatchingLibs
 		static cv::Mat
 		parallel_search (cv::Mat features_set, int branch_factor, int max_leaves, int trees, 
 							int max_searched, int max_out, cv::Mat query);
+		
+		static cv::Mat
+		linear_search (cv::Mat features_set, cv::Mat query);
+
 		static void
 		traverse_search_tree (tree<cv::Mat> &s_tree, tree<cv::Mat>::iterator from, cv::Mat &found, 
 								std::vector<tree<cv::Mat>::pre_order_iterator> &refine_queue, cv::Mat query);
@@ -120,6 +125,22 @@ MatchingLibs::partition_around_centers (std::vector<int> &centers_set, cv::Mat &
 
 
 cv::Mat
+MatchingLibs::linear_search (cv::Mat features_set, cv::Mat query)
+{
+	std::vector<uint16_t> distances;
+	for(int i=0; i < features_set.rows; i++)
+	{
+		distances.push_back(cv::norm(features_set.row(i), query, cv::NORM_HAMMING));
+	}
+	// Return the best match found
+	cv::Mat found = cv::Mat::zeros(features_set.size().width, 1, CV_8U);
+	int min_index = std::distance(distances.begin(), std::min_element(distances.begin(), distances.end()));
+	found.row(1) = features_set.row(min_index);
+
+	return found;
+}
+
+cv::Mat
 MatchingLibs::parallel_search (cv::Mat features_set, int branch_factor, int max_leaves, int trees, 
 								int max_searched, int max_out, cv::Mat query)
 {
@@ -130,7 +151,7 @@ MatchingLibs::parallel_search (cv::Mat features_set, int branch_factor, int max_
 		tree<cv::Mat> out_tree;
 		tree<cv::Mat>::pre_order_iterator out_iter;
 		out_iter = out_tree.begin();
-		out_iter = out_tree.insert(out_iter, cv::Mat::zeros(features_set.size().width, 1, CV_16F)); // Dummy head
+		out_iter = out_tree.insert(out_iter, cv::Mat::zeros(features_set.size().width, 1, CV_8U)); // Dummy head
 		MatchingLibs::create_search_tree(features_set, out_tree, out_iter, 5, 50);
 		tree_vec.push_back(out_tree);
 	}

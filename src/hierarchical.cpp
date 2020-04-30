@@ -13,11 +13,11 @@ using namespace std;
 using namespace cv;
 
 int const feat_to_compute = 50;
-int const max_features_to_search = 50;
+int const max_features_to_search = 25;
 int const branching_factor = 5;
 int const max_leaves_amount = 5;
 int const trees_amount = 2;
-int const top_k_feat = 2;	// Extract just top 2, in order to use NNDR technique
+int const top_k_feat = 2;	// Extract just top 2, enough in order to use NNDR technique
 int const px_to_draw = 100;
 int const gap = 30;
 float const max_nndr_ratio = 0.85;
@@ -52,10 +52,8 @@ int main(int, char **)
 	cv::Mat sift_matches = find_SIFT_matches(src, dest);
 	// Features computation : ORB comparison
 
-	//cv::imshow("ORB matches", orb_matches);
 	cv::imwrite("../orb_matches.jpeg", orb_matches);
 	cv::imwrite("../sift_matches.jpeg", sift_matches);
-	//cv::waitKey(0);
 
 }
 
@@ -89,6 +87,9 @@ find_ORB_matches (cv::Mat &src, cv::Mat &dest)
 	{
 		cv::Mat out = MatchingLibs::parallel_search(dest_out_orb_feat, branching_factor, max_leaves_amount, trees_amount, 
 													max_features_to_search, top_k_feat, src_out_orb_feat.row(j));
+
+		// Linear search, just for profiling purposes
+		cv::Mat out_lin = MatchingLibs::linear_search(dest_out_orb_feat, src_out_orb_feat.row(j));
 
 		/*
 		std::cout << out.size().height << " matches obtained!" << std::endl;
