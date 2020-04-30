@@ -52,7 +52,11 @@ MatchingLibs::merge_mat (cv::Mat &dest, cv::Mat &cand)
 		bool there = false;
 		for(int k = 0; k < dest.size().height; k++)
 		{
-			if(cv::norm(dest.row(k), cand.row(i), cv::NORM_HAMMING) == 0)
+			// Check if such entry is already there
+			cv::Mat diff = cv::Mat::zeros(1, cand.size().height, CV_8U);
+			cv::bitwise_xor(dest.row(k), cand.row(i), diff);   
+
+			if(cv::countNonZero(diff) == 0)
 			{
 				there = true;
 				break;

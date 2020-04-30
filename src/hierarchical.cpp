@@ -12,7 +12,7 @@ using namespace std;
 // OpenCV
 using namespace cv;
 
-int const feat_to_compute = 100;
+int const feat_to_compute = 50;
 int const max_features_to_search = 25;
 int const branching_factor = 5;
 int const max_leaves_amount = 20;
@@ -56,17 +56,17 @@ int main(int, char **)
 
 	// Compute matches
 
-	/*
+	
 	cv::Mat orb_matches = find_ORB_matches(src, dest);
 	cv::Mat sift_matches = find_SIFT_matches(src, dest);
 	// Features computation : ORB comparison
 
 	cv::imwrite("../orb_matches.jpeg", orb_matches);
 	cv::imwrite("../sift_matches.jpeg", sift_matches);
-	*/
+	
 
 	// Profile code
-	profile_orb(src, dest, false);
+	//profile_orb(src, dest, false);
 
 }
 
