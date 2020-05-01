@@ -20,7 +20,7 @@
 
 \usepackage[acronyms,nonumberlist,nopostdot,nomain,nogroupskip]{glossaries}
 \usepackage{tablefootnote}
-\usepackage{booktabs}
+%\usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{tikz}
 \usepackage{pgfplots}
@@ -31,19 +31,24 @@
 \usetikzlibrary{plotmarks,patterns,decorations.pathreplacing,backgrounds,calc,arrows,arrows.meta,spy,matrix}
 \usepgfplotslibrary{patchplots,groupplots}
 \usepackage{tikzscale}
-\usepackage{hyperref}
 
 \usepackage{multirow}
 \usepackage{tkz-kiviat}
 
 \renewcommand{\figurename}{Figure}
 %\renewcommand{\tablename}{Tab.}
-\usepackage[font=small]{subcaption}
-\usepackage[font=small]{caption}
+
 
 \usepackage{mathtools}
 \usepackage[affil-it]{authblk}
 \renewcommand{\abstractname}{Summary}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\renewcommand{\algorithmicreturn}{\textbf{Parameters:}}
+
+\usepackage[font=small]{subcaption}
+\usepackage[font=small]{caption}
+\usepackage{hyperref}
 
 \newcommand{\MP}[1]{\color{red}{\textbf{MP says: #1 }}\color{black}}
 
@@ -78,15 +83,48 @@
 \end{abstract}
 
 \section*{Introduction}
-  The task of detecting salient points and computing their description as features has always been of primary importance in computer vision. This problem has been tackled using primarily two approaches, namely binary descriptors such as BRIEF~\cite{calonder2010brief}, ORB~\cite{rublee2011orb} and vector-based solutions like SIFT~\cite{lowe2004distinctive}. While the former category of descriptors is fast to compute and has a very limited memory footprint, the latter exhibit a top of the class robustness wrt scale and rotation changes, on top of unmatched discriminative capabilities over large datasets~\cite{grauman2005efficient, karami2017image}. It follows that transforming vector features into binary ones apparently promises to offer the best of both worlds; this work is in fact based on the same premise. In particular, the presented implementation leverages a median quantization strategy, which manages to obtain satisfying accuracy while exhibiting low computational complexity~\cite{peker2011binary}.\\
-  In turn, matching such descriptors has also been another key problem and in such regard the focus of features matching algorithms has also changed over the years: since the size of the available datasets is growing at a staggering pace, the current challenge is to find significant matches in contexts where an exhaustive, linear search is unfeasible. Even though the majority of algorithms sharing such target are based on an approximate nearest neighbour strategy and/or hashing techniques, one of the most promising algorithms for computer vision applications relies on a hierarchical decomposition of the search space~\cite{muja2012fast}. \\
+  The task of detecting salient points and computing their description as features has always been of primary importance in computer vision. This problem has been tackled using primarily two approaches, namely binary descriptors such as BRIEF~\cite{calonder2010brief}, ORB~\cite{rublee2011orb} and vector-based solutions like SIFT~\cite{lowe2004distinctive}. While the former category of descriptors is fast to compute and has a very limited memory footprint, the latter exhibit a top of the class robustness wrt scale and rotation changes, on top of unmatched discriminative capabilities over large datasets~\cite{grauman2005efficient, karami2017image}. It follows that transforming vector features into binary ones apparently promises to offer the best of both worlds; this work is in fact based on the same premise. In particular, the presented implementation leverages a median quantization strategy, which manages to obtain satisfying accuracy while exhibiting low computational complexity~\cite{peker2011binary}.
+  
+  
+  In turn, matching such descriptors has also been another key problem and in such regard the focus of features matching algorithms has also changed over the years: since the size of the available datasets is growing at a staggering pace, the current challenge is to find significant matches in contexts where an exhaustive, linear search is unfeasible. Even though the majority of algorithms sharing such target are based on an approximate nearest neighbour strategy and/or hashing techniques, one of the most promising algorithms for computer vision applications relies on a hierarchical decomposition of the search space~\cite{muja2012fast}.
+  
+  
   The purpose of this work is to analyze the performance of the combination of the aforementioned approaches, namely the hierarchical-based matching of median-quantized SIFT features.
   \section*{Median quantization}
   A SIFT feature is basically an histogram of gradient directions that is encoded as a $128$-dimensional vector. Since its components take values in the range $[0, 255]$ it follows that SIFT vectors live in a space of $256^{128}$ possible points. In practice though only a small portion of this huge space is actually used: by examining the marginal distributions of the single components it is possible to notice an exponential-like distribution~\cite{peker2011binary}, a phenomenon that indicates that these descriptors do not actually fully exploit their theoretically available expressive power. This is demonstrated even further by the fact that pairwise distances are also relatively small compared to the values that can be expected of in such high dimensional space. It follows that it should be possible to compress the information contained in a SIFT descriptor into a smaller vector, in fact even down to the binary case. In this regard, since the primary goal of this quantization is to preserve the pairwise distances, namely to map similar features vectors into similar binary representations, the optimal strategy is to choose as quantization threshold the median value of a given vector`s components. This choice maximizes the entropy of the quantized feature and it has been empirically shown that it also preserves the pairwise distances, leading to matches that are consistent with the original features representation~\cite{peker2011binary}.
   
+  
     \section*{Fast matching of binary features}
+Once the SIFT features have been quantized into binary vectors, the presented implementation searches similar descriptors by using the fast matching technique for binary features introduced in~\cite{muja2012fast}. This algorithm essentially decomposes the search space by first building a tree whose non-leaf nodes represent cluster centers and leaf ones contain disjoint subsets of the original features set. Finally this hierarchical structure is used in order to look for matches by performing a number of comparisons that is significantly smaller compared to the linear, exhaustive search case. Clearly this algorithm can be decomposed into two phases: the computation of the hierarchical structures and the subsequent, actual search; the aim is to optimize the complexity of the latter, as the former can be sensibly considered a pre-computation.
+
+\begin{algorithm}[h!]
+\begin{algorithmic}[1]
+ \REQUIRE Dataset of features $D$
+ \ENSURE Hierarchical clustering tree
+ \RETURN Branching factor $K$ and max leaf set size $S_{L}$
+ \IF{$\Vert D \Vert < S_L$} 
+ \STATE {create leaf node set with the points of $D$} 
+ \ELSE 
+ \STATE{$P \leftarrow K$ points selected randomly from $D$}
+ \STATE {$C \leftarrow$ list of cluster obtained by partitioning $D$ around the points of $P$} 
+ \FOR{each cluster $C_i \in C$} 
+ \STATE {create non-leaf node storing the $i$th center} 
+ \STATE {recursively apply the algorithm to the points in $C_i$} 
+ \ENDFOR
+ \ENDIF
+ \end{algorithmic}
+ \caption{Creation of a hierarchical clustering tree}\label{Alg:treec}
+\end{algorithm}
+
+The creation of the tree is performed by recursively clustering the original set into a pre-determined amount of clusters $K$: first of all $K$ points of the dataset are randomly chosen as centers and stored in non-leaf nodes of the tree, then the set points are partitioned around such centers and are placed as their children. Such process it then repeated in a recursive manner until the cluster size is smaller than a given threshold, as can be seen in Alg.~\ref{Alg:treec}. Actually, the algorithm uses multiple copies of such trees; the rationale behind such choice is that since the centers selection is completely random, different trees are likely to have extremely different structures that may lead to quite heterogeneous times needed to reach the target leaf node in the tree. Therefore, by using these structures in parallel the resulting search time is the minimum of such value across all the trees, effectively increasing the chance of finding a match in a small amount of time.
+
+
+The process of scanning these hierarchical data structures in order to find significant matches starts by performing a single traverse of  the pre-computed trees.
+
+
+
     
-\begin{figure}
+\begin{figure}[h!]
   \centering
     % this sets the width of the figure, adjust to your needs
     \setlength\fwidth{0.6\columnwidth}
@@ -97,8 +135,8 @@
     \caption{Average \gls{urllc} delay versus aggregated \gls{embb} throughput.}
     \label{Fig:t_d_versus_numEmbbUes}
 \end{figure}    
-    
-    \section*{Performance evaluation}
+
+	\section*{Implementation details and performance evaluation}    
 
 \bibliographystyle{IEEEtran}
 \bibliography{bibl.bib}
