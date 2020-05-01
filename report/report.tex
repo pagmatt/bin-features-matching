@@ -1,6 +1,6 @@
 \newcommand{\CLASSINPUTtoptextmargin}{2.5cm}
 \newcommand{\CLASSINPUTbottomtextmargin}{2cm}
-\documentclass[a4paper, 11pt, oneside]{article}
+\documentclass[a4paper, 12pt, oneside]{article}
 \usepackage{url}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -43,7 +43,7 @@
 
 \usepackage{mathtools}
 \usepackage[affil-it]{authblk}
-\renewcommand{\abstractname}{\large Summary}
+\renewcommand{\abstractname}{Summary}
 
 \newcommand{\MP}[1]{\color{red}{\textbf{MP says: #1 }}\color{black}}
 
@@ -54,14 +54,15 @@
 \input{tikz-set.tex}
 
 \def\si{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
-\usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage[a4paper, total={6.2in, 9.2in}]{geometry}
+\date{}
 
 \makeglossaries
 
 \begin{document}
 
 
-\title{\huge A hierarchical SIFT matching \\ implementation in C++} 
+\title{\vspace{-2.0cm}\huge A hierarchical SIFT matching \\ implementation in C\texttt{++}} 
 \author[1]{\Large Matteo Pagin}
 \affil[1]{Department of Information Engineering, University of Padova}
 
@@ -72,21 +73,24 @@
 \thispagestyle{empty}
 
 \begin{abstract}
-  The ever increasing number of connected devices and of new, heterogeneous mobile use cases implies that 5G cellular systems will face demanding technical challenges. For example, \gls{urllc} and \gls{embb} scenarios present orthogonal \gls{qos} requirements that the 5G aims to satisfy with a unified \gls{ran} design. Network slicing and \gls{mmwave} communications have been identified as possible enablers for 5G, as they provide, respectively, the necessary scalability and flexibility to adapt the network to each specific use case environment, and low latency and multi-gigabit-per-second wireless links, which tap into a vast, currently unused portion of the spectrum.
-  The optimization and integration of these technologies is still an open research challenge, which requires innovations at different layers of the protocol stack. This paper proposes to combine them in a \gls{ran} slicing framework for \glspl{mmwave}, based on carrier aggregation. Notably, we introduce MilliSlice, a cross-carrier scheduling policy that exploits the diversity of the carriers and maximizes their utilization, thus simultaneously guaranteeing high throughput for the \gls{embb} slices and low latency, high reliability for the \gls{urllc} flows.
+	In recent years the usage of binary-valued features such as BRIEF and ORB has experienced a dramatic upsurge, driven by the following advantages over vector-based solutions: faster computation, quicker comparison and a significantly smaller memory footprint. Nevertheless, these binaries features, especially in certain scenarios, lack the descriptive capability of vector-based features such as SIFT, which in this regard are still capable to outperform solutions like BRIEF and ORB. Therefore, the research efforts have been focusing on combining the strengths of these two approaches. In this regard, a fast SIFT matching algorithm is hereby presented and implemented, featuring the binary quantization of SIFT features in conjunction of a hierarchical-based binary matching technique.
   % In this paper, we propose to perform slicing using carrier aggregation, and introduce RoGeR, a cross-carrier scheduling policy
 \end{abstract}
 
-  The ever increasing number of connected devices and of new, heterogeneous mobile use cases implies that 5G cellular systems will face demanding technical challenges. For example, \gls{urllc} and \gls{embb} scenarios present orthogonal \gls{qos} requirements that the 5G aims to satisfy with a unified \gls{ran} design. Network slicing and \gls{mmwave} communications have been identified as possible enablers for 5G, as they provide, respectively, the necessary scalability and flexibility to adapt the network to each specific use case environment, and low latency and multi-gigabit-per-second wireless links, which tap into a vast, currently unused portion of the spectrum.
+\section*{Introduction}
+  The task of detecting salient points and computing their description as features has always been of primary importance in computer vision. This problem has been tackled using primarily two approaches, namely binary descriptors such as BRIEF~\cite{calonder2010brief}, ORB~\cite{rublee2011orb} and vector-based solutions like SIFT~\cite{lowe2004distinctive}. While the former category of descriptors is fast to compute and has a very limited memory footprint, the latter exhibit a top of the class robustness wrt scale and rotation changes, on top of unmatched discriminative capabilities over large datasets~\cite{grauman2005efficient, karami2017image}. It follows that transforming vector features into binary ones apparently promises to offer the best of both worlds; this work is in fact based on the same premise. In particular, the presented implementation leverages a median quantization strategy, which manages to obtain satisfying accuracy while exhibiting low computational complexity~\cite{peker2011binary}.\\
+  In turn, matching such descriptors has also been another key problem and in such regard the focus of features matching algorithms has also changed over the years: since the size of the available datasets is growing at a staggering pace, the current challenge is to find significant matches in contexts where an exhaustive, linear search is unfeasible. Even though the majority of algorithms sharing such target are based on an approximate nearest neighbour strategy and/or hashing techniques, one of the most promising algorithms for computer vision applications relies on a hierarchical decomposition of the search space~\cite{muja2012fast}. \\
+  The purpose of this work is to analyze the performance of the combination of the aforementioned approaches, namely the hierarchical-based matching of median-quantized SIFT features.
+  \section*{Median quantization}
+  The optimization and integration of these technologies is still an open research challenge, which requires innovations at different layers of the protocol stack. This paper proposes to combine them in a \gls{ran} slicing framework for \glspl{mmwave}, based on carrier aggregation. Notably, we introduce MilliSlice, a cross-carrier scheduling policy that exploits the diversity of the carriers and maximizes their utilization, thus simultaneously guaranteeing high throughput for the \gls{embb} slices and low latency, high reliability for the \gls{urllc} flows.
+    The ever increasing number of connected devices and of new, heterogeneous mobile use cases implies that 5G cellular systems will face demanding technical challenges. For example, \gls{urllc} and \gls{embb} scenarios present orthogonal \gls{qos} requirements that the 5G aims to satisfy with a unified \gls{ran} design. Network slicing and \gls{mmwave} communications have been identified as possible enablers for 5G, as they provide, respectively, the necessary scalability and flexibility to adapt the network to each specific use case environment, and low latency and multi-gigabit-per-second wireless links, which tap into a vast, currently unused portion of the spectrum.
+    \section*{Fast matching of binary features}
   The optimization and integration of these technologies is still an open research challenge, which requires innovations at different layers of the protocol stack. This paper proposes to combine them in a \gls{ran} slicing framework for \glspl{mmwave}, based on carrier aggregation. Notably, we introduce MilliSlice, a cross-carrier scheduling policy that exploits the diversity of the carriers and maximizes their utilization, thus simultaneously guaranteeing high throughput for the \gls{embb} slices and low latency, high reliability for the \gls{urllc} flows.
     The ever increasing number of connected devices and of new, heterogeneous mobile use cases implies that 5G cellular systems will face demanding technical challenges. For example, \gls{urllc} and \gls{embb} scenarios present orthogonal \gls{qos} requirements that the 5G aims to satisfy with a unified \gls{ran} design. Network slicing and \gls{mmwave} communications have been identified as possible enablers for 5G, as they provide, respectively, the necessary scalability and flexibility to adapt the network to each specific use case environment, and low latency and multi-gigabit-per-second wireless links, which tap into a vast, currently unused portion of the spectrum.
   The optimization and integration of these technologies is still an open research challenge, which requires innovations at different layers of the protocol stack. This paper proposes to combine them in a \gls{ran} slicing framework for \glspl{mmwave}, based on carrier aggregation. Notably, we introduce MilliSlice, a cross-carrier scheduling policy that exploits the diversity of the carriers and maximizes their utilization, thus simultaneously guaranteeing high throughput for the \gls{embb} slices and low latency, high reliability for the \gls{urllc} flows.
     The ever increasing number of connected devices and of new, heterogeneous mobile use cases implies that 5G cellular systems will face demanding technical challenges. For example, \gls{urllc} and \gls{embb} scenarios present orthogonal \gls{qos} requirements that the 5G aims to satisfy with a unified \gls{ran} design. Network slicing and \gls{mmwave} communications have been identified as possible enablers for 5G, as they provide, respectively, the necessary scalability and flexibility to adapt the network to each specific use case environment, and low latency and multi-gigabit-per-second wireless links, which tap into a vast, currently unused portion of the spectrum.
+    \section*{Performance evaluation}
   The optimization and integration of these technologies is still an open research challenge, which requires innovations at different layers of the protocol stack. This paper proposes to combine them in a \gls{ran} slicing framework for \glspl{mmwave}, based on carrier aggregation. Notably, we introduce MilliSlice, a cross-carrier scheduling policy that exploits the diversity of the carriers and maximizes their utilization, thus simultaneously guaranteeing high throughput for the \gls{embb} slices and low latency, high reliability for the \gls{urllc} flows.
-    The ever increasing number of connected devices and of new, heterogeneous mobile use cases implies that 5G cellular systems will face demanding technical challenges. For example, \gls{urllc} and \gls{embb} scenarios present orthogonal \gls{qos} requirements that the 5G aims to satisfy with a unified \gls{ran} design. Network slicing and \gls{mmwave} communications have been identified as possible enablers for 5G, as they provide, respectively, the necessary scalability and flexibility to adapt the network to each specific use case environment, and low latency and multi-gigabit-per-second wireless links, which tap into a vast, currently unused portion of the spectrum.
-  The optimization and integration of these technologies is still an open research challenge, which requires innovations at different layers of the protocol stack. This paper proposes to combine them in a \gls{ran} slicing framework for \glspl{mmwave}, based on carrier aggregation. Notably, we introduce MilliSlice, a cross-carrier scheduling policy that exploits the diversity of the carriers and maximizes their utilization, thus simultaneously guaranteeing high throughput for the \gls{embb} slices and low latency, high reliability for the \gls{urllc} flows.
-
-\cite{muja2012fast}\cite{peker2011binary}
 
 \bibliographystyle{IEEEtran}
 \bibliography{bibl.bib}
