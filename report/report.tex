@@ -1,16 +1,16 @@
 \newcommand{\CLASSINPUTtoptextmargin}{2.5cm}
 \newcommand{\CLASSINPUTbottomtextmargin}{2cm}
-\documentclass[a4paper, 12pt, oneside]{article}
+\documentclass[a4paper, 11pt, oneside]{article}
 \usepackage{url}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{lmodern}
-\renewcommand*\familydefault{\sfdefault}
 \usepackage{xcolor}
 \usepackage{amsmath}
 \usepackage{amssymb}
+%\usepackage{cmbright}
 \usepackage{algorithm}
 \usepackage{algorithmic}
+\usepackage{sansmathfonts}
 
 
 \newcommand{\red}[1]{\begin{color}{red}#1\end{color}}
@@ -62,7 +62,7 @@
 \begin{document}
 
 
-\title{\vspace{-2.0cm}\huge A hierarchical SIFT matching \\ implementation in C\texttt{++}} 
+\title{\vspace{-2.0cm}\huge \textbf{A hierarchical SIFT matching \\ implementation in C\texttt{++}} }
 \author[1]{\Large Matteo Pagin}
 \affil[1]{Department of Information Engineering, University of Padova}
 
@@ -82,15 +82,23 @@
   In turn, matching such descriptors has also been another key problem and in such regard the focus of features matching algorithms has also changed over the years: since the size of the available datasets is growing at a staggering pace, the current challenge is to find significant matches in contexts where an exhaustive, linear search is unfeasible. Even though the majority of algorithms sharing such target are based on an approximate nearest neighbour strategy and/or hashing techniques, one of the most promising algorithms for computer vision applications relies on a hierarchical decomposition of the search space~\cite{muja2012fast}. \\
   The purpose of this work is to analyze the performance of the combination of the aforementioned approaches, namely the hierarchical-based matching of median-quantized SIFT features.
   \section*{Median quantization}
-  The optimization and integration of these technologies is still an open research challenge, which requires innovations at different layers of the protocol stack. This paper proposes to combine them in a \gls{ran} slicing framework for \glspl{mmwave}, based on carrier aggregation. Notably, we introduce MilliSlice, a cross-carrier scheduling policy that exploits the diversity of the carriers and maximizes their utilization, thus simultaneously guaranteeing high throughput for the \gls{embb} slices and low latency, high reliability for the \gls{urllc} flows.
-    The ever increasing number of connected devices and of new, heterogeneous mobile use cases implies that 5G cellular systems will face demanding technical challenges. For example, \gls{urllc} and \gls{embb} scenarios present orthogonal \gls{qos} requirements that the 5G aims to satisfy with a unified \gls{ran} design. Network slicing and \gls{mmwave} communications have been identified as possible enablers for 5G, as they provide, respectively, the necessary scalability and flexibility to adapt the network to each specific use case environment, and low latency and multi-gigabit-per-second wireless links, which tap into a vast, currently unused portion of the spectrum.
+  A SIFT feature is basically an histogram of gradient directions that is encoded as a $128$-dimensional vector. Since its components take values in the range $[0, 255]$ it follows that SIFT vectors live in a space of $256^{128}$ possible points. In practice though only a small portion of this huge space is actually used: by examining the marginal distributions of the single components it is possible to notice an exponential-like distribution~\cite{peker2011binary}, a phenomenon that indicates that these descriptors do not actually fully exploit their theoretically available expressive power. This is demonstrated even further by the fact that pairwise distances are also relatively small compared to the values that can be expected of in such high dimensional space. It follows that it should be possible to compress the information contained in a SIFT descriptor into a smaller vector, in fact even down to the binary case. In this regard, since the primary goal of this quantization is to preserve the pairwise distances, namely to map similar features vectors into similar binary representations, the optimal strategy is to choose as quantization threshold the median value of a given vector`s components. This choice maximizes the entropy of the quantized feature and it has been empirically shown that it also preserves the pairwise distances, leading to matches that are consistent with the original features representation~\cite{peker2011binary}.
+  
     \section*{Fast matching of binary features}
-  The optimization and integration of these technologies is still an open research challenge, which requires innovations at different layers of the protocol stack. This paper proposes to combine them in a \gls{ran} slicing framework for \glspl{mmwave}, based on carrier aggregation. Notably, we introduce MilliSlice, a cross-carrier scheduling policy that exploits the diversity of the carriers and maximizes their utilization, thus simultaneously guaranteeing high throughput for the \gls{embb} slices and low latency, high reliability for the \gls{urllc} flows.
-    The ever increasing number of connected devices and of new, heterogeneous mobile use cases implies that 5G cellular systems will face demanding technical challenges. For example, \gls{urllc} and \gls{embb} scenarios present orthogonal \gls{qos} requirements that the 5G aims to satisfy with a unified \gls{ran} design. Network slicing and \gls{mmwave} communications have been identified as possible enablers for 5G, as they provide, respectively, the necessary scalability and flexibility to adapt the network to each specific use case environment, and low latency and multi-gigabit-per-second wireless links, which tap into a vast, currently unused portion of the spectrum.
-  The optimization and integration of these technologies is still an open research challenge, which requires innovations at different layers of the protocol stack. This paper proposes to combine them in a \gls{ran} slicing framework for \glspl{mmwave}, based on carrier aggregation. Notably, we introduce MilliSlice, a cross-carrier scheduling policy that exploits the diversity of the carriers and maximizes their utilization, thus simultaneously guaranteeing high throughput for the \gls{embb} slices and low latency, high reliability for the \gls{urllc} flows.
-    The ever increasing number of connected devices and of new, heterogeneous mobile use cases implies that 5G cellular systems will face demanding technical challenges. For example, \gls{urllc} and \gls{embb} scenarios present orthogonal \gls{qos} requirements that the 5G aims to satisfy with a unified \gls{ran} design. Network slicing and \gls{mmwave} communications have been identified as possible enablers for 5G, as they provide, respectively, the necessary scalability and flexibility to adapt the network to each specific use case environment, and low latency and multi-gigabit-per-second wireless links, which tap into a vast, currently unused portion of the spectrum.
+    
+\begin{figure}
+  \centering
+    % this sets the width of the figure, adjust to your needs
+    \setlength\fwidth{0.6\columnwidth}
+    % this sets the height of the figure, adjust to your needs
+    \setlength\fheight{0.4\columnwidth}
+    \input{figures/perf.tex}
+    \setlength\belowcaptionskip{-.3cm}
+    \caption{Average \gls{urllc} delay versus aggregated \gls{embb} throughput.}
+    \label{Fig:t_d_versus_numEmbbUes}
+\end{figure}    
+    
     \section*{Performance evaluation}
-  The optimization and integration of these technologies is still an open research challenge, which requires innovations at different layers of the protocol stack. This paper proposes to combine them in a \gls{ran} slicing framework for \glspl{mmwave}, based on carrier aggregation. Notably, we introduce MilliSlice, a cross-carrier scheduling policy that exploits the diversity of the carriers and maximizes their utilization, thus simultaneously guaranteeing high throughput for the \gls{embb} slices and low latency, high reliability for the \gls{urllc} flows.
 
 \bibliographystyle{IEEEtran}
 \bibliography{bibl.bib}

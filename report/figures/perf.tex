@@ -1,0 +1,64 @@
+
+\begin{tikzpicture}
+\pgfplotsset{every tick label/.append style={font=\scriptsize}}
+
+\definecolor{color0}{rgb}{0.12156862745098,0.466666666666667,0.705882352941177}
+\definecolor{color1}{rgb}{1,0.498039215686275,0.0549019607843137}
+\definecolor{color2}{rgb}{0.172549019607843,0.627450980392157,0.172549019607843}
+
+\begin{axis}[
+width=\fwidth,
+height=\fheight,
+at={(0\fwidth,0\fheight)},
+scale only axis,
+% axis line style={white!80!black},
+legend style={at={(0.5,0.95)}, anchor=south, draw=white!80!black, font=\footnotesize},
+legend columns=2,
+% tick align=outside,
+% x grid style={white!80!black},
+xlabel style={font=\footnotesize},
+xlabel={amount of SIFT features},
+xmajorgrids,
+% xmajorticks=false,
+xmin=1, xmax=210,
+xtick style={color=white!15!black},
+% y grid style={white!80!black},
+ylabel shift = -3 pt,
+ylabel style={font=\footnotesize},
+ylabel={Normalized Hamming distance cost},
+ymajorgrids,
+% ymajorticks=false,
+ymin=0, ymax=1.1,
+ytick style={color=white!15!black},
+axis background/.style={fill=white},
+ymode=log,
+log basis y={10}
+]
+
+\addplot [semithick, color0, dash pattern=on 1.5pt off 1pt, mark=square*, mark size=2, mark options={solid,draw=white}]
+table {%
+50 0.00625
+100 0.0125
+200 0.0425
+};
+\addlegendentry{ORB, hierarchical}
+
+\addplot [semithick, color1, mark=*, mark size=2, mark options={solid,draw=white}]
+table {%
+50 0.0626
+100 0.25
+200 1
+};
+\addlegendentry{ORB, linear}
+
+\addplot [semithick, color2, dash pattern=on 5pt off 1.5pt, mark=triangle*, mark size=3, mark options={solid,rotate=180,draw=white}]
+table {%
+50 0.0057
+100 0.0114
+200 0.0388
+};
+\addlegendentry{SIFT, hierarchical}
+\end{axis}
+\end{tikzpicture}
+
+
