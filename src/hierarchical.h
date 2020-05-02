@@ -156,7 +156,7 @@ MatchingLibs::parallel_search (cv::Mat &features_set, int branch_factor, int max
 		tree<cv::Mat>::pre_order_iterator out_iter;
 		out_iter = out_tree.begin();
 		out_iter = out_tree.insert(out_iter, cv::Mat::zeros(features_set.size().width, 1, CV_8U)); // Dummy head
-		MatchingLibs::create_search_tree(features_set, out_tree, out_iter, 5, 50);
+		MatchingLibs::create_search_tree(features_set, out_tree, out_iter, branch_factor, max_leaves);
 		tree_vec.push_back(out_tree);
 	}
 	// Search
@@ -185,7 +185,6 @@ MatchingLibs::parallel_search (cv::Mat &features_set, int branch_factor, int max
 		distances.push_back(cv::norm(found.row(i), query, cv::NORM_HAMMING));
 	}
 	// Create vec containing indexes of elements
-	//std::cout << found.size().height << " possible, unskimmed matches found!" << std::endl;
 	std::vector<int> sorted_idx(distances.size());
 	std::iota(std::begin(sorted_idx), std::end(sorted_idx), 0);
 	// Sort indexes, but comparing the distances
@@ -228,8 +227,7 @@ MatchingLibs::traverse_search_tree (tree<cv::Mat> &s_tree, tree<cv::Mat>::iterat
 				lucky_it = lottery_it;
 			}
 		}
-		// Recurse on such node
-		MatchingLibs::traverse_search_tree (s_tree, lucky_it, found, refine_queue, query);
+
 		// Add the others to the recursion 
 		for(int i=0; i < s_tree.number_of_children(from); i++)
 		{
@@ -240,6 +238,8 @@ MatchingLibs::traverse_search_tree (tree<cv::Mat> &s_tree, tree<cv::Mat>::iterat
 			}
 		}
 
+		// Recurse on the closest node
+		MatchingLibs::traverse_search_tree (s_tree, lucky_it, found, refine_queue, query);
 	}
 }
 
