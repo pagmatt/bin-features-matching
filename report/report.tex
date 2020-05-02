@@ -66,7 +66,7 @@
 \begin{document}
 
 
-\title{\vspace{-2.0cm}\huge \textbf{A hierarchical SIFT matching \\ implementation in C\texttt{++}} }
+\title{\vspace{-1.0cm}\huge \textbf{A hierarchical SIFT matching \\ implementation in C\texttt{++}} }
 \author[1]{\Large Matteo Pagin}
 \affil[1]{Department of Information Engineering, University of Padova}
 
@@ -163,22 +163,27 @@ The creation of the tree is performed by recursively clustering the original set
 
 The actual process of scanning these hierarchical data structures in order to find significant matches starts by performing a single traverse of the pre-computed trees. During this initial traversal, the node which is the closest to the query is picked and the search continues in a recursive fashion on that very same node until a leaf is reached. Upon such event, the points contained in the leaf are linearly scanned and added to the main queue $R$; on the other hand the nodes that we neglect along the way are progressively added to an auxiliary priority queue $PQ$, as explained in Alg.~\ref{Alg:traverse}. Once the first traverse has been undertaken, a refinement of the search is performed by progressive traversals of the nodes contained in $PQ$, until either we reach the end of the queue or the amount of points visited surpasses the threshold $L_{max}$. The latter process allows to improve the accuracy of the results: in fact $L_{max}$ gives as the possibility to fine-tune the trade-off between precision of the search algorithm and its computational cost, therefore rending the whole procedure flexible and possibly suited to different use-cases. Finally, the max amount of leaves and the branching factor do not have a significant impact on the search performance but they have the potential to sensibly influence the tress build time. Once again, this allows to tune the algorithm to the specific application, as some of them may consider the tree creation as a pre-computation, while others may need to do that in real-time, hence exhibit the need of faster hierarchical structures creation.
 
-
-
     
 \begin{figure}[h!]
   \centering
     % this sets the width of the figure, adjust to your needs
     \setlength\fwidth{0.6\columnwidth}
     % this sets the height of the figure, adjust to your needs
-    \setlength\fheight{0.4\columnwidth}
+    \setlength\fheight{0.3\columnwidth}
     \input{figures/perf.tex}
     \setlength\belowcaptionskip{-.3cm}
     \caption{Average \gls{urllc} delay versus aggregated \gls{embb} throughput.}
-    \label{Fig:t_d_versus_numEmbbUes}
+    \label{Fig:perf_cost}
 \end{figure}    
 
-	\section*{Implementation details and performance evaluation}    
+\section*{Implementation details and performance evaluation} 
+The implementation that is hereby presented and freely available\footnote{\url{https://github.com/pagmatt/bin-features-matching}} leverages both aforementioned algorithms, specifically it uses median quantization on SIFT features and then finds matches among them by performing the fast matching introduced in~\cite{muja2012fast}. The programming language that has been chosen for the task is C\texttt{++}, due to the performance-oriented nature of these algorithms. On top of the language standard library, the implementation makes use of an open-source, template-based tree library\footnote{\url{https://github.com/kpeeters/tree.hh}} and of OpenCV\footnote{\url{https://github.com/opencv/opencv}} in order to compute the ORB and SIFT features from the dataset images.
+
+
+In order to carry out the performance evaluation of the presented strategy a linear, exhaustive search among the whole dataset approach has been selected as baseline. Regarding the performance indicators, computational cost and search accuracy have been elected as the two most crucial factors. Furthermore, the complexity of the algorithm has been measured in CPU cycles load, in order to provide as much abstraction from the underlying hardware as possible. In order to so, the program as been launched using the debugging tool Valgrind, enabling its profiling tool Callgrind\footnote{\url{https://linux.die.net/man/1/callgrind}} and finally analyzing the output traces in Kcachegrind. Using the latter, the tree creation process has been neglected, focusing on the computational cost of the search subroutines only.
+
+
+As can be appreciated in Fig.~\ref{Fig:perf_cost}, the implemented strategy manages to significantly outperform the linear search approach: in fact the hierarchical binary search of quantized SIFT features is also marginally faster than the ORB case: with the quantization process each SIFT descriptor is encoded in as little as a $128$ bits vector, while an ORB feature requires from a min of $128$ to a maximum of $512$ bits. Therefore, the pair-wise Hamming distances computation of quantized SIFT feature is actually faster than using ORB, since it involves a smaller amount of bits. Finally, the precision performance can be observed from Fig.
 
 \bibliographystyle{IEEEtran}
 \bibliography{bibl.bib}

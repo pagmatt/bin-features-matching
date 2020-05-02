@@ -1,14 +1,10 @@
 #include "hierarchical.h"
-//#include "hierarchical_lib.hh"
 // Salient points and features computation
 #include <opencv2/highgui.hpp>
 #include <opencv2/features2d.hpp>
-// Linear algebra library
-// #include <armadillo>
+
 
 using namespace std;
-// Armadillo
-// using namespace arma;
 // OpenCV
 using namespace cv;
 
@@ -19,7 +15,8 @@ int const max_leaves_amount = 10;
 int const trees_amount = 1;
 int const top_k_feat = 2;	// Extract just top 2, enough in order to use NNDR technique
 int const px_to_draw = 100;
-int const gap = 30;
+int const v_gap = 30;
+int const h_gap = 50;
 float const max_nndr_ratio = 0.9;
 std::string ref_path = "../testing_dataset/img_ref.png";
 std::string target_path = "../testing_dataset/img2.png"; // number can be set in [1,5]
@@ -90,12 +87,13 @@ find_ORB_matches (cv::Mat &src, cv::Mat &dest)
 	dest_orb_obj->compute(dest, dest_orb_points, dest_out_orb_feat);
 
 	// Output image
-	cv::Mat stacked_orb = cv::Mat::zeros(px_to_draw*feat_to_compute + gap*(feat_to_compute - 1),
-										 px_to_draw*3, CV_8U); // Create stacked image canvas
+	cv::Mat stacked_orb = cv::Mat::zeros(px_to_draw*feat_to_compute + v_gap*(feat_to_compute - 1),
+										 px_to_draw*2 + h_gap, CV_8U); // Create stacked image canvas
 	stacked_orb.setTo((cv::Scalar(255,255,255))); // Make it white
 
 	unsigned valid_feat = 0;	// Keeps track of how many valid features we have matched up to now
 	unsigned skipped = 0;
+	std::vector<unsigned> distances;
 
 	// Search for similar features
 	for(int j = 0; j < feat_to_compute; j++)	// TODO: 5 -> feat-to-compute
@@ -105,7 +103,7 @@ find_ORB_matches (cv::Mat &src, cv::Mat &dest)
 													max_features_to_search, top_k_feat, src_out_orb_feat.row(j));
 
 		// Linear search, just for profiling purposes
-		cv::Mat out_lin = MatchingLibs::linear_search(dest_out_orb_feat, src_out_orb_feat.row(j));
+		//cv::Mat out_lin = MatchingLibs::linear_search(dest_out_orb_feat, src_out_orb_feat.row(j));
 
 		/*
 		std::cout << out.size().height << " matches obtained!" << std::endl;
@@ -116,8 +114,8 @@ find_ORB_matches (cv::Mat &src, cv::Mat &dest)
 		}	
 		*/
 		// Nearest Neighbour Distance Ratio (NNDR) to skim the matches and keep only the best ones
-		if(cv::norm(src_out_orb_feat.row(j), out.row(0), cv::NORM_HAMMING)/
-			cv::norm(src_out_orb_feat.row(j), out.row(1), cv::NORM_HAMMING) < max_nndr_ratio)
+		unsigned dist_to_query = cv::norm(src_out_orb_feat.row(j), out.row(0), cv::NORM_HAMMING);
+		if(dist_to_query/cv::norm(src_out_orb_feat.row(j), out.row(1), cv::NORM_HAMMING) < max_nndr_ratio)
 		{
 			continue;
 		}
@@ -135,6 +133,8 @@ find_ORB_matches (cv::Mat &src, cv::Mat &dest)
 		cv::Mat src_crop = src(src_to_crop);
 
 		// Visualize search results: feature match
+		// Store the distance to the query
+		distances.push_back(dist_to_query);
 		// Must find the index in the original matrix, in order to associate feature to its descriptor
 		Point2f dest_kp = dest_orb_points[MatchingLibs::search_feature(dest_out_orb_feat, out.row(0))].pt; // Get coord of matched, closest feature
 		cv::Rect dst_to_crop(dest_kp.x - px_to_draw/2, dest_kp.y - px_to_draw/2, px_to_draw, px_to_draw); // x_start, y_start, width, height
@@ -151,16 +151,16 @@ find_ORB_matches (cv::Mat &src, cv::Mat &dest)
 		//cv::Mat stacked_orb = cv::Mat::zeros(px_to_draw, px_to_draw*3, CV_8U); // Create stacked image canvas
 		//stacked_orb.setTo((cv::Scalar(255,255,255))); // Make it white
  
-		src_crop.copyTo(stacked_orb.colRange(1, px_to_draw+1).rowRange((gap+px_to_draw)*valid_feat, 
-									px_to_draw + (gap+px_to_draw)*valid_feat));
-		dest_crop.copyTo(stacked_orb.colRange(2*px_to_draw, 3*px_to_draw).rowRange((gap+px_to_draw)*valid_feat, 
-									px_to_draw + (gap+px_to_draw)*valid_feat));
+		src_crop.copyTo(stacked_orb.colRange(0, px_to_draw).rowRange((v_gap+px_to_draw)*valid_feat, 
+									px_to_draw + (v_gap+px_to_draw)*valid_feat));
+		dest_crop.copyTo(stacked_orb.colRange(px_to_draw + h_gap, 2*px_to_draw + h_gap).rowRange((v_gap+px_to_draw)*valid_feat, 
+									px_to_draw + (v_gap+px_to_draw)*valid_feat));
 
 		valid_feat++;
 	}
 
 	// Crop and keep only portion of the image that is actually used
-	cv::Rect valid_crop(0, 0, stacked_orb.cols, valid_feat*(px_to_draw) + (valid_feat - 1)*gap);	// x_start, y_start, width, height
+	cv::Rect valid_crop(0, 0, stacked_orb.cols, valid_feat*(px_to_draw) + (valid_feat - 1)*v_gap);	// x_start, y_start, width, height
 	stacked_orb = stacked_orb(valid_crop);
 	std::cout << valid_feat << " valid ORB matches found!" << std::endl;
 	if(skipped > 0)
@@ -196,12 +196,14 @@ find_SIFT_matches (cv::Mat &src, cv::Mat &dest)
 	cv::Mat quantized_src_sift = MatchingLibs::median_quantize(src_out_sift_feat);
 
 	// Output image
-	cv::Mat stacked_sift = cv::Mat::zeros(px_to_draw*feat_to_compute + gap*(feat_to_compute - 1),
-										 px_to_draw*3, CV_8U); // Create stacked image canvas
+	cv::Mat stacked_sift = cv::Mat::zeros(px_to_draw*feat_to_compute + v_gap*(feat_to_compute - 1),
+										 px_to_draw*2 + h_gap, CV_8U); // Create stacked image canvas
 	stacked_sift.setTo((cv::Scalar(255,255,255))); // Make it white
 
 	unsigned valid_feat = 0;	// Keeps track of how many valid features we have matched up to now
 	unsigned skipped = 0;
+	std::vector<unsigned> distances;
+	
 	// Search for similar features
 	for(int j = 0; j < feat_to_compute; j++)	// TODO: 5 -> feat-to-compute
 	{
@@ -216,8 +218,8 @@ find_SIFT_matches (cv::Mat &src, cv::Mat &dest)
 		}	
 		*/
 		// Nearest Neighbour Distance Ratio (NNDR) to skim the matches and keep only the best ones
-		if(cv::norm(quantized_dest_sift.row(j), out.row(0), cv::NORM_HAMMING)/
-			cv::norm(quantized_dest_sift.row(j), out.row(1), cv::NORM_HAMMING) < max_nndr_ratio)
+		unsigned dist_to_query = cv::norm(quantized_dest_sift.row(j), out.row(0), cv::NORM_HAMMING);
+		if(dist_to_query/cv::norm(quantized_dest_sift.row(j), out.row(1), cv::NORM_HAMMING) < max_nndr_ratio)
 		{
 			continue;
 		}
@@ -234,6 +236,8 @@ find_SIFT_matches (cv::Mat &src, cv::Mat &dest)
 		}
 		cv::Mat src_crop = src(src_to_crop);
 		// Visualize search results: feature match
+		// Store the distance to the query
+		distances.push_back(dist_to_query);
 		// Must find the index in the original matrix, in order to associate feature to its descriptor
 		Point2f dest_kp = dest_sift_points[MatchingLibs::search_feature(quantized_dest_sift, out.row(0))].pt; // Get coord of matched, closest feature
 		cv::Rect dst_to_crop(dest_kp.x - px_to_draw/2, dest_kp.y - px_to_draw/2, px_to_draw, px_to_draw); // x_start, y_start, width, height
@@ -250,16 +254,16 @@ find_SIFT_matches (cv::Mat &src, cv::Mat &dest)
 		//cv::Mat stacked_orb = cv::Mat::zeros(px_to_draw, px_to_draw*3, CV_8U); // Create stacked image canvas
 		//stacked_orb.setTo((cv::Scalar(255,255,255))); // Make it white
  
-		src_crop.copyTo(stacked_sift.colRange(1, px_to_draw+1).rowRange((gap+px_to_draw)*valid_feat, 
-									px_to_draw + (gap+px_to_draw)*valid_feat));
-		dest_crop.copyTo(stacked_sift.colRange(2*px_to_draw, 3*px_to_draw).rowRange((gap+px_to_draw)*valid_feat, 
-									px_to_draw + (gap+px_to_draw)*valid_feat));
+		src_crop.copyTo(stacked_sift.colRange(0, px_to_draw).rowRange((v_gap+px_to_draw)*valid_feat, 
+									px_to_draw + (v_gap+px_to_draw)*valid_feat));
+		dest_crop.copyTo(stacked_sift.colRange(px_to_draw + h_gap, 2*px_to_draw + h_gap).rowRange((v_gap+px_to_draw)*valid_feat, 
+									px_to_draw + (v_gap+px_to_draw)*valid_feat));
 
 		valid_feat++;
 	}
 
 	// Crop and keep only portion of the image that is actually used
-	cv::Rect valid_crop(0, 0, stacked_sift.cols, valid_feat*(px_to_draw) + (valid_feat - 1)*gap);	// x_start, y_start, width, height
+	cv::Rect valid_crop(0, 0, stacked_sift.cols, valid_feat*(px_to_draw) + (valid_feat - 1)*v_gap);	// x_start, y_start, width, height
 	stacked_sift = stacked_sift(valid_crop);
 	std::cout << valid_feat << " valid SIFT matches found!" << std::endl;
 	if(skipped > 0)
