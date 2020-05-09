@@ -11,6 +11,7 @@
 \usepackage{algorithm}
 \usepackage{algorithmic}
 \usepackage{sansmathfonts}
+\usepackage{wrapfig}
 
 
 \newcommand{\red}[1]{\begin{color}{red}#1\end{color}}
@@ -121,7 +122,7 @@ The creation of the tree is performed by recursively clustering the original set
 \begin{algorithm}[H]
     \centering
     \caption{Parallel search of hierarchical clustering trees}\label{Alg:search}
-    \begin{algorithmic}[2]
+    \begin{algorithmic}[1]
 		\REQUIRE Hierarchical clustering trees $T_i$, query point $Q$, max amount of points to examine $L_{max}$
 		\ENSURE $K$ nearest approximate neighbours of $Q$
 		\STATE {$L \leftarrow 0$ counter of searched points}
@@ -129,7 +130,7 @@ The creation of the tree is performed by recursively clustering the original set
 		\FOR{each tree $T_i$} 
 		\STATE {\texttt{TraverseTree$(T_i, PQ, R, Q)$}} 
 		\ENDFOR
-		\WHILE {$PQ \neq \emptyset and L < L_{max}$} 
+		\WHILE {$PQ \neq \emptyset$ and $L < L_{max}$} 
 		\STATE {$N \leftarrow$ top of $PQ$} 
 		\STATE {\texttt{TraverseTree$(N, PQ, R, Q)$}} 
 		\ENDWHILE
@@ -142,8 +143,8 @@ The creation of the tree is performed by recursively clustering the original set
 \begin{algorithm}[H]
     \centering
     \caption{\texttt{TraverseTree$(N, PQ, R, Q)$}}\label{Alg:traverse}
-    \begin{algorithmic}[3]
-	    \REQUIRE Specific node of a clustering trees $N$, query point $Q$, amount of leaf examined $L$
+    \begin{algorithmic}[1]
+	    \REQUIRE Specific node of a clustering trees $N$, query point $Q$, amount of leaves examined $L$
 		\ENSURE Updated main queue $R$ and auxiliary refinement queue $PQ$
 		 \IF{$N$ is a leaf node} 
 		 \STATE {linearly search all points $\in N$ and add them to $R$} 
@@ -151,7 +152,7 @@ The creation of the tree is performed by recursively clustering the original set
 		 \ELSE 
 		 \STATE{$C \leftarrow$ child nodes of $N$}
 		 \STATE{$N' \leftarrow$ closes node of $C$ to $Q$}
-		 \STATE {$C_p \leftarrow C \ N'$} 
+		 \STATE {$C_p \leftarrow C \setminus N'$} 
 		 \STATE {add the nodes of $C_p$ to $PQ$} 
 		 \STATE {\texttt{TraverseTree$(N', PQ, R)$}} 
 		 \ENDIF
@@ -167,23 +168,38 @@ The actual process of scanning these hierarchical data structures in order to fi
 \begin{figure}[h!]
   \centering
     % this sets the width of the figure, adjust to your needs
-    \setlength\fwidth{0.6\columnwidth}
+    \setlength\fwidth{0.7\columnwidth}
     % this sets the height of the figure, adjust to your needs
-    \setlength\fheight{0.3\columnwidth}
+    \setlength\fheight{0.2\columnwidth}
     \input{figures/perf.tex}
     \setlength\belowcaptionskip{-.3cm}
-    \caption{Average \gls{urllc} delay versus aggregated \gls{embb} throughput.}
+    \captionsetup{justification=centering}
+    \caption{Normalized computational cost of the search subroutines as the amount of computed features ranges $\in \{50, 100, 200\}$. The Y axis uses a logarithmic scale.}
     \label{Fig:perf_cost}
 \end{figure}    
 
 \section*{Implementation details and performance evaluation} 
-The implementation that is hereby presented and freely available\footnote{\url{https://github.com/pagmatt/bin-features-matching}} leverages both aforementioned algorithms, specifically it uses median quantization on SIFT features and then finds matches among them by performing the fast matching introduced in~\cite{muja2012fast}. The programming language that has been chosen for the task is C\texttt{++}, due to the performance-oriented nature of these algorithms. On top of the language standard library, the implementation makes use of an open-source, template-based tree library\footnote{\url{https://github.com/kpeeters/tree.hh}} and of OpenCV\footnote{\url{https://github.com/opencv/opencv}} in order to compute the ORB and SIFT features from the dataset images.
+The implementation that is hereby presented\footnote{Available at: \url{https://github.com/pagmatt/bin-features-matching}} leverages both aforementioned algorithms, specifically it uses median quantization on SIFT features and then finds matches among them by performing the fast matching introduced in~\cite{muja2012fast}. The programming language that has been chosen for the task is C\texttt{++}, due to the performance-oriented nature of these algorithms. On top of the language standard library, the implementation makes use of an open-source, template-based tree library\footnote{\url{https://github.com/kpeeters/tree.hh}} and of OpenCV\footnote{\url{https://github.com/opencv/opencv}} in order to compute the ORB and SIFT features from the dataset images.
 
 
-In order to carry out the performance evaluation of the presented strategy a linear, exhaustive search among the whole dataset approach has been selected as baseline. Regarding the performance indicators, computational cost and search accuracy have been elected as the two most crucial factors. Furthermore, the complexity of the algorithm has been measured in CPU cycles load, in order to provide as much abstraction from the underlying hardware as possible. In order to so, the program as been launched using the debugging tool Valgrind, enabling its profiling tool Callgrind\footnote{\url{https://linux.die.net/man/1/callgrind}} and finally analyzing the output traces in Kcachegrind. Using the latter, the tree creation process has been neglected, focusing on the computational cost of the search subroutines only.
+In order to carry out the performance evaluation of the presented strategy a linear, exhaustive search among the whole dataset approach has been selected as baseline. Regarding the performance indicators, computational cost and search accuracy have been elected as the two most crucial factors. Furthermore, the complexity of the algorithm has been measured in number of CPU cycles (and their relative load), in order to provide as much abstraction from the underlying hardware as possible. This goal has been met by executing the program via the debugger Valgrind, enabling its profiling tool Callgrind\footnote{\url{https://linux.die.net/man/1/callgrind}} and finally analyzing the output traces in Kcachegrind. An important remark is that during such profiling the tree creation process has been neglected, focusing on the computational cost of the search subroutines only.
+\begin{wrapfigure}{r}{0.5\textwidth}
+\vspace{-20pt}
+  \begin{center}
+    \includegraphics[width=0.45\textwidth]{figures/merged.png}
+  \end{center}
+  \caption{Top $6$ matches returned by ORB (on the left) and SIFT (on the right). In both cases, the leftmost images are the search queries while the rightmost ones are the corresponding matches.}
+  \label{Fig:perf_acc}
+\end{wrapfigure}
+As can be appreciated in Fig.~\ref{Fig:perf_cost}, the implemented strategy manages to significantly outperform the linear search approach: in fact the hierarchical binary search of quantized SIFT features is also marginally faster than the ORB case: with the quantization process each SIFT descriptor is encoded in as little as a $128$ bits vector, while an ORB feature requires from a min of $128$ to a maximum of $512$ bits. Therefore, the pair-wise Hamming distances computation of quantized SIFT features is actually faster than the ORB case, since it involves a smaller amount of bits. 
 
 
-As can be appreciated in Fig.~\ref{Fig:perf_cost}, the implemented strategy manages to significantly outperform the linear search approach: in fact the hierarchical binary search of quantized SIFT features is also marginally faster than the ORB case: with the quantization process each SIFT descriptor is encoded in as little as a $128$ bits vector, while an ORB feature requires from a min of $128$ to a maximum of $512$ bits. Therefore, the pair-wise Hamming distances computation of quantized SIFT feature is actually faster than using ORB, since it involves a smaller amount of bits. Finally, the precision performance can be observed from Fig.
+Finally, the resulting search accuracy can be observed in Fig.~\ref{Fig:perf_acc}, where the top matches for both ORB and SIFT are exhibited. These samples are obtained through a skimming process of the initial matches set which is based on the Nearest Neighbour Distance Ratio (NNDR) criteria introduced in~\cite{lowe2004distinctive}. 
+\clearpage
+As expected, SIFT features are capable of offering stronger descriptive capabilities and to outperform in such regard the ORB descriptors, providing in the majority of the cases matches that are indeed relevant ones. Furthermore, perhaps surprisingly, such superiority is not lost after the quantization process, suggesting that in such regard the choice of a median threshold in indeed a successful one.
+
+\section*{Conclusions} 
+The presented implementation combines a binary quantization technique with an approximate matching algorithm, managing to provide accurate results with a low computational complexity. Therefore, it is well-suited to modern computer vision applications that need to interact with the massive datasets of the current Big Data era.
 
 \bibliographystyle{IEEEtran}
 \bibliography{bibl.bib}
