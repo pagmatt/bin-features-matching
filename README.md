@@ -18,7 +18,7 @@ Specifically, the hierarchical matching algorithm is used in conjunction of medi
 #### Usage:
 
 ```bash
-> # OpenCV dependancies must be already installed in your system. If that is not the case, please follow
+# OpenCV dependancies must be already installed in your system. If that is not the case, please follow
 # http://docs.opencv.org/trunk/doc/tutorials/introduction/linux_install/linux_install.html for detailed instructions on how to install them
 > git clone https://github.com/pagmatt/bin-features-matching
 > cd bin-features-matching
