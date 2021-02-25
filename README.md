@@ -8,6 +8,7 @@
 Implementation of the hierarchical matching strategy presented in [Fast Matching of Binary Features, Marius Muja and David G. Lowe](https://www.cs.ubc.ca/~lowe/papers/12mujaCRV.pdf) in C++. 
 
 Specifically, the hierarchical matching algorithm is used in conjunction of median quantization in order to provide a fast and scalable algorithm for the computation of SIFT features matches.
+Further details can be found in the [project report](report/report.pdf)
 
 #### Dependencies:
 * OpenCV 4.*
